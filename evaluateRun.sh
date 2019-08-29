@@ -1,0 +1,1 @@
+python allmethods.py --data_dirs=result/ --out_dir=result/
