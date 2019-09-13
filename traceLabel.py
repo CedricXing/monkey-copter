@@ -109,7 +109,7 @@ def labelTraces_LR(states=None,profiles=None,dir=None,start=0,end=1):
         # print(profile)
         label = True
         for mission_id in range(0,len(profile)):
-            if mission_id % 3 == 0:
+            if mission_id > 0 and mission_id % 3 == 0:
                 # print('mission id :'+str(mission_id))
                 continue
             # print(mission_id)

@@ -71,6 +71,7 @@ def tarantula(all_lines,traces,labels):
             suspici = failed / total_failed / (passed/total_passed+failed/total_failed)
         suspicious.append([suspici,line])
     suspicious.sort(reverse=True)
+    # return suspicious
     return compressSameValue(suspicious)
     
 
@@ -136,6 +137,7 @@ def crosstab(all_lines,traces,labels):
         else:
             suspicious.append([-M,line])
     suspicious.sort(reverse=True)
+    # return suspicious
     return compressSameValue(suspicious)
     
 def print_line_info(all_lines,traces,lineno):
@@ -170,14 +172,14 @@ def sus_analysis(lines,sus_list):
 
 if __name__ == '__main__':
     interval = 49
-    # group = real_life_bug_group
-    group = bug_group
+    group = real_life_bug_group
+    # group = bug_group
     # bug_id_list = [0,1,7,11,15]
-    bug_id_list = [1,2,6,8,10]
+    bug_id_list = [0,2,3,4,6]
     all_lines = statics(bug_id_list,group)
     # print(all_lines)
     start = 0
-    traces = executionTracesClean(bug_id_list,group,start=0,end=start+interval)
+    traces = executionTracesClean(bug_id_list,group,start=start,end=start+interval)
     # print(all_lines)
     print(len(traces))
     for bug_id in bug_id_list:
@@ -185,13 +187,15 @@ if __name__ == '__main__':
     states,profiles = simulationResultClean(start,start+interval)
     labels1,positive1 = labelTraces_LR(states,profiles)
     labels2,positive2 = labelTraces_LR1(states,profiles)
-    positive_id = []
+    positive_id = set()
     for i in range(0,len(traces)):
         for bug_id in bug_id_list:
             for line_no in group[bug_id]['lineno']:
-                if line_no in traces[i] :
-                    positive_id.append(i)
+                line = group[bug_id]['file'] + '-' + str(line_no)
+                if line in traces[i] :
+                    positive_id.add(i)
                     break
+    positive_id = list(positive_id)
     print(positive_id)
     negative_id = []
     for i in range(0,len(traces)):
@@ -227,7 +231,10 @@ if __name__ == '__main__':
     sus_cro1 = crosstab(all_lines,traces,labels1)
     sus_tar2 = tarantula(all_lines,traces,labels2)
     sus_cro2 = crosstab(all_lines,traces,labels2)
-    print(sus_tar1)
+    print(len(sus_tar1))
+    print(len(sus_tar2))
+    print(len(sus_cro1))
+    print(len(sus_cro2))
     # print(sus_cro2)
     # print(sus_tar2)
     # print(sus_cro2)
