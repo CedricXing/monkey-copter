@@ -3,8 +3,6 @@
 import os
 import random
 
-ARDUPILOT_DIR = "/home/cedric/Desktop/arduPilot/"
-
 bug_num_to_insert = 3
 
 # target_statements = [
@@ -304,12 +302,12 @@ bug_group = [
      "start" : 2800000,
      "lineno" : [545,549,553],#,557],
      "type": 'Uninitialized'}, #15
-    {"file": "libraries/AC_WPNav/AC_WPNav.cpp",
-     "location": "libraries/AC_WPNav/AC_WPNav.cpp-calc_slow_down_distance-1285",
-     "indices": [],
-     "start" : 3000000,
-     "lineno" : [],
-     "type": 'no bug'}, #16
+    # {"file": "libraries/AC_WPNav/AC_WPNav.cpp",
+    #  "location": "libraries/AC_WPNav/AC_WPNav.cpp-calc_slow_down_distance-1285",
+    #  "indices": [],
+    #  "start" : 3000000,
+    #  "lineno" : [],
+    #  "type": 'no bug'}, #16
 ]
 
 real_life_target_bugs = [
@@ -393,14 +391,14 @@ real_life_bug_group = [
 #         with open(dest_dir+"bug_location.txt", "w") as nf:
 #             nf.write(str(bug["location"]))
 
-def inject_bugs(selected_bugs_id,real_life=False):
+def inject_bugs(selected_bugs_id,config):
     # selected_bugs = random.sample(target_statements,3)
     # selected_bugs = random.sample(range(0,len(target_statements)),3)
     # selected_bugs = [2,3]
     # print(selected_bugs)
-    dest_dir = ARDUPILOT_DIR
+    dest_dir = config['root_dir']
     selected_bugs = []
-    if real_life:
+    if config['real_life'] == 'True':
         targets = real_life_target_bugs
         mutated = real_life_mutated_bugs
         group = real_life_bug_group
@@ -413,7 +411,7 @@ def inject_bugs(selected_bugs_id,real_life=False):
         selected_bugs.append(group[id])
     bug_info = ''
     for bug in selected_bugs:
-        relative_file = open(ARDUPILOT_DIR+bug['file'])
+        relative_file = open(config['root_dir']+bug['file'])
         print(relative_file)
         relative_file_data = relative_file.read()
         relative_file.close()

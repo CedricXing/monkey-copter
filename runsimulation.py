@@ -16,6 +16,12 @@ elf_dir = "%s%d/" % (ardupilot_dir, 0)
 exp_out_dir = "%s%s/%d/" % (out_dir, 'PA', 0)
 bug_id = 0
 
+def init(config):
+    ardupilot_dir = config['root_dir'] + 'experiment/elf/'
+    out_dir = config['root_dir'] + 'experiment/output/'
+    elf_dir = "%s%d/" % (ardupilot_dir, 0)
+    exp_out_dir = "%s%s/%d/" % (out_dir, 'PA', 0)
+    
 def print_info(vehicle):
     print('current altitude:%s'%str(vehicle.location.global_relative_frame.alt))
     print('current lat:%s'%vehicle.location.global_relative_frame.lat)
@@ -169,11 +175,12 @@ def print_usage(filename):
     #     print_usage(sys.argv[0])
     #     sys.exit(2)
 
-def run_sim(sim_start=0,sim_end=0):
-    
+def run_sim(config):
+    init(config)
+    sim_start = config['start']
+    sim_end = config['end']
     
     sample_cnt = sim_start
-    sim_end = sim_end
     mission_loader_id = 1
     labeling_method = 'PA'
     # for opt, arg in opts:
