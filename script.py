@@ -6,9 +6,6 @@ from runsimul_extend import run_sim_extend
 import random
 from ConfigParser import ConfigParser
 
-dir_compile = '/home/cedric/Desktop/arduPilot/'
-dir_monkey = 'home/cedric/Desktop/arduPilot/monkey-copter/'
-
 def parserConfig():
     cfg = ConfigParser()
     cfg.read('config.ini')
@@ -51,9 +48,11 @@ def run(config):
     inject_bugs(bug_id_list,config)
 #     for i in bug_id_list:
 #         os.system('cp /home/cedric/Desktop/copterTest/0/' + group[i]['file'] + ' /home/cedric/Desktop/arduPilot/' + group[i]['file'])
-    os.chdir(dir_compile)
-    os.system('bash bs.sh')
+    os.chdir(config['root_dir'])
+    os.system('make sitl -j4')
     time.sleep(15)
+    os.system('cp build/sitl/bin/arducopter experiment/elf/0/ArduCopter.elf')
+    time.sleep(3)
     if config['real_life'] and len(set([0,1,2]).intersection(set(bug_id_list))) != 0:
         run_sim_extend(config)
     else:

@@ -11,18 +11,7 @@ from getopt import getopt, GetoptError
 from pymavlink import mavutil
 
 TOTAL_SIM_TIME = 40
-ardupilot_dir = '/home/cedric/Desktop/arduPilot/experiment/elf/'
-out_dir = '/home/cedric/Desktop/arduPilot/experiment/output/'
-elf_dir = "%s%d/" % (ardupilot_dir, 0)
-exp_out_dir = "%s%s/%d/" % (out_dir, 'PA', 0)
 bug_id = 0
-
-def init(config):
-    ardupilot_dir = config['root_dir'] + 'experiment/elf/'
-    out_dir = config['root_dir'] + 'experiment/output/'
-    elf_dir = "%s%d/" % (ardupilot_dir, 0)
-    exp_out_dir = "%s%s/%d/" % (out_dir, 'PA', 0)
-
 
 def print_info(vehicle):
     print('current altitude:%s'%str(vehicle.location.global_relative_frame.alt))
@@ -50,20 +39,24 @@ class SimRunner:
                 self.ready = False
                 return
 
-    def __init__(self, sample_id, core_id, initial_profile):
+    def __init__(self, sample_id, core_id, initial_profile,config):
+        ardupilot_dir = config['root_dir'] + 'experiment/elf/'
+        out_dir = config['root_dir'] + 'experiment/output/'
+        self.elf_dir = "%s%d/" % (ardupilot_dir, 0)
+        self.exp_out_dir = "%s%s/%d/" % (out_dir, 'PA', 0)
         self.ready = True
         self.states = []
         self.sim_id = "%d_%d" % (sample_id, core_id)
         self.profile = initial_profile
-        copter_file = elf_dir + "ArduCopter.elf"
+        copter_file = self.elf_dir + "ArduCopter.elf"
         # copter_file = elf_dir + "ArduPlane.elf"
         self.delta = 0.1
         self.sitl = SITL(path=copter_file)
         home_str = "%.6f,%.6f,%.2f,%d" % (initial_profile.lat, initial_profile.lon, initial_profile.alt,
                                           initial_profile.yaw)
         sitl_args = ['-S', '-I%d' % bug_id, '--home='+home_str, '--model',
-                     '+', '--speedup=1', '--defaults='+elf_dir+'copter.parm']
-        self.sitl.launch(sitl_args, await_ready=True, restart=True, wd=elf_dir)
+                     '+', '--speedup=1', '--defaults='+self.elf_dir+'copter.parm']
+        self.sitl.launch(sitl_args, await_ready=True, restart=True, wd=self.elf_dir)
         port_number = 5760 + bug_id * 10
         self.mission_no = 0
         # self.missions = [Mission1(),Mission2(),Mission3(),Mission4(),Mission5(),Mission6(),Mission7()]
@@ -190,11 +183,11 @@ class SimRunner:
                 # f.write('lat:%s lon:%s alt:%s roll:%s pitch:%s yaw:%s'%(str(state[0]),str(state[1]),str(state[2]),str(state[3]),str(state[4]),str(state[5])))
         # print(self.states)
         # np.save(exp_out_dir + "states_np_%s" % self.sim_id, np.array(self.states))
-        np.save(exp_out_dir + "states_np_%s" % self.sim_id, np.array(self.states))
-        np.save(exp_out_dir + "profiles_np_%s" % self.sim_id, np.array(self.profiles))
+        np.save(self.exp_out_dir + "states_np_%s" % self.sim_id, np.array(self.states))
+        np.save(self.exp_out_dir + "profiles_np_%s" % self.sim_id, np.array(self.profiles))
 
         print("Output Execution Path...")
-        with open(exp_out_dir + "raw_%s.txt" % self.sim_id, "w") as execution_file:
+        with open(self.exp_out_dir + "raw_%s.txt" % self.sim_id, "w") as execution_file:
             ep_line = self.sitl.stdout.readline(0.01)
             while ep_line is not None:
                 execution_file.write(ep_line)
@@ -218,7 +211,6 @@ def print_usage(filename):
     #     sys.exit(2)
 
 def run_sim_extend(config):
-    init(config)
     sim_start = config['start']
     sim_end = config['end']
     sample_cnt = sim_start
@@ -248,7 +240,7 @@ def run_sim_extend(config):
     #     elif opt == '-i':
     #         bug_id = int(arg)
 
-    if ardupilot_dir is None or out_dir is None or labeling_method is None or bug_id is None:
+    if labeling_method is None or bug_id is None:
         print_usage(sys.argv[0])
         sys.exit(2)
 
@@ -260,7 +252,6 @@ def run_sim_extend(config):
                 profiles_generated = generate_profiles(cluster=False)
             else:
                 profiles_generated = generate_profiles(cluster=False)
-            profile_name = exp_out_dir+"profiles_%d.pckl" % sample_cnt
             # with open(profile_name, 'w') as f: #Cedric: save profile
             #     pickle.dump(profiles_generated, f)
             p = profiles_generated[0]
