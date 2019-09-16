@@ -39,7 +39,7 @@ Now, you should be able build with waf. Try
 ```
 make sitl -j4
 ```
-**Note**: go to ./local/lib/python2.7/site-packages/MAVProxy/modules, and edit mavproxy_link.py to remove the line with MAV_TYPE_DODECAROTOR.
+**Note**: go to ~/.local/lib/python2.7/site-packages/MAVProxy/modules, and edit mavproxy_link.py to remove the line with MAV_TYPE_DODECAROTOR.
 
 Now, you can run the SITL simulator. For example, for the multicopter code, go to the ArduCopter directory and start simulating using **sim_vehicle.py**.
 ```
