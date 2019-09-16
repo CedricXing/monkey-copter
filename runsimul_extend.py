@@ -2,12 +2,9 @@ from dronekit_sitl import SITL
 from dronekit import connect, APIException, VehicleMode, LocationGlobalRelative, LocationGlobal, Command
 import time
 import numpy as np
-import pickle
 from datatype import *
-# from mission import *
 from mission1 import *
 import sys
-from getopt import getopt, GetoptError
 from pymavlink import mavutil
 
 TOTAL_SIM_TIME = 40
@@ -44,6 +41,8 @@ class SimRunner:
         out_dir = config['root_dir'] + 'experiment/output/'
         self.elf_dir = "%s%d/" % (ardupilot_dir, 0)
         self.exp_out_dir = "%s%s/%d/" % (out_dir, 'PA', 0)
+	print(self.elf_dir)
+	print(self.exp_out_dir)
         self.ready = True
         self.states = []
         self.sim_id = "%d_%d" % (sample_id, core_id)
@@ -240,11 +239,6 @@ def run_sim_extend(config):
     #     elif opt == '-i':
     #         bug_id = int(arg)
 
-    if labeling_method is None or bug_id is None:
-        print_usage(sys.argv[0])
-        sys.exit(2)
-
-    
     while sample_cnt < sim_end:
         print("simulation round %d-----------------------------------------\n" %sample_cnt)
         try:
@@ -268,7 +262,7 @@ def run_sim_extend(config):
             #     profiles = pickle.load(f) # load again?
             for core_cnt, profile in enumerate(profiles_generated):
                 state_data = []
-                sim = SimRunner(sample_cnt, core_cnt, profile)
+                sim = SimRunner(sample_cnt, core_cnt, profile,config)
                 if sim.ready:
                     sim.run()
                 else:

@@ -149,7 +149,7 @@ class SimRunner:
         np.save(self.exp_out_dir + "profiles_np_%s" % self.sim_id, np.array(self.profiles))
 
         print("Output Execution Path...")
-        with open(exp_out_dir + "raw_%s.txt" % self.sim_id, "w") as execution_file:
+        with open(self.exp_out_dir + "raw_%s.txt" % self.sim_id, "w") as execution_file:
             ep_line = self.sitl.stdout.readline(0.01)
             while ep_line is not None:
                 execution_file.write(ep_line)
