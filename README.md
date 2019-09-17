@@ -76,3 +76,8 @@ Monkey-copter is an automatic human-user mimicking program that is created to ru
 cd ArduPilot
 git clone https://github.com/CedricXing/monkey-copter.git
 ```
+Go to the monkey-copter and revise the configuration file `config.ini`. Then try
+```
+nohup python2.7 script.py &
+```
+to run the monkey program as a background process.
