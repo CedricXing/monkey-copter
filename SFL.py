@@ -2,19 +2,17 @@ from traceLabel import *
 from injector import *
 from ConfigParser import ConfigParser
 
-dir = '/home/cedric/Desktop/arduPilot/'
-
-def statics(bug_id_list,group):
+def statics(bug_id_list,group,cfg):
     all_lines = set()
     for bug_id in bug_id_list:
-        with open(dir+group[bug_id]['file'],'r') as f:
+        with open(cfg.get('param','root_dir')+group[bug_id]['file'],'r') as f:
             for line_no,line in enumerate(f,1):
                 if 'EXECUTE_MARK()' in line:
                     all_lines.add(group[bug_id]['file']+'-'+str(line_no))
     return list(all_lines)
 
-def executionTracesClean(bug_id_list,group,start=0,end=0):
-    output_dir = '/home/cedric/Desktop/arduPilot/experiment/output/PA/0/'
+def executionTracesClean(bug_id_list,group,start,end,cfg):
+    output_dir = cfg.get('param','root_dir')+'experiment/output/PA/0/'
     traces = []
     for simulate_id in range(start,end+1):
         # trace_set = set()
@@ -189,11 +187,11 @@ def analysis(cfg,bug_id_list):
     else:
         group = bug_group
     # bug_id_list = [0,1,7,11,15]
-    all_lines = statics(bug_id_list,group)
+    all_lines = statics(bug_id_list,group,cfg)
     # print(all_lines)
     start = int(cfg.get('param','start'))
     end = int(cfg.get('param','end'))
-    traces = executionTracesClean(bug_id_list,group,start=start,end=end-1)
+    traces = executionTracesClean(bug_id_list,group,start=start,end=end-1,cfg)
     # print(all_lines)
     print(len(traces))
     for bug_id in bug_id_list:
