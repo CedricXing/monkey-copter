@@ -1,5 +1,6 @@
 from traceLabel import *
 from injector import *
+from ConfigParser import ConfigParser
 
 dir = '/home/cedric/Desktop/arduPilot/'
 
@@ -170,21 +171,34 @@ def sus_analysis(lines,sus_list):
                     print('line no %s rank #%d sus : %f'%(line,i,sus[i][0]))
     print('~~~~~~~~~~~')
 
-if __name__ == '__main__':
-    interval = 49
-    group = real_life_bug_group
-    # group = bug_group
+def parserConfig():
+    cfg = ConfigParser()
+    cfg.read('config.ini')
+    config = {}
+    config['root_dir'] = cfg.get('param','root_dir')
+    config['real_life'] = cfg.get('param','real_life')
+    config['mutiple_bugs'] = cfg.get('param','mutiple_bugs')
+    config['start'] = int(cfg.get('param','start'))
+    config['end'] = int(cfg.get('param','end'))
+    config['rounds'] = int(cfg.get('param','rounds'))
+    return config
+
+def analysis(cfg,bug_id_list):
+    if cfg.get('param','real_life') == 'True':
+        group = real_life_bug_group
+    else:
+        group = bug_group
     # bug_id_list = [0,1,7,11,15]
-    bug_id_list = [0,2,3,4,6]
     all_lines = statics(bug_id_list,group)
     # print(all_lines)
-    start = 0
-    traces = executionTracesClean(bug_id_list,group,start=start,end=start+interval)
+    start = int(cfg.get('param','start'))
+    end = int(cfg.get('param','end'))
+    traces = executionTracesClean(bug_id_list,group,start=start,end=end-1)
     # print(all_lines)
     print(len(traces))
     for bug_id in bug_id_list:
         print(str(bug_id) + ':' + group[bug_id]['file'])
-    states,profiles = simulationResultClean(start,start+interval)
+    states,profiles = simulationResultClean(start,end-1)
     labels1,positive1 = labelTraces_LR(states,profiles)
     labels2,positive2 = labelTraces_LR1(states,profiles)
     positive_id = set()
@@ -218,10 +232,6 @@ if __name__ == '__main__':
         if i not in positive2 and i in positive_id:
             false_negative2 += 1
 
-        # print('false1_positive : %d / %d = %f'%(false_positive1,len(negative_id),float(false_positive1)/len(negative_id)))
-        # print('false2_positive : %d / %d = %f'%(false_positive2,len(negative_id),float(false_positive2)/len(negative_id)))
-        # print('false1_negative : %d / %d = %f'%(false_negative1,len(positive_id),float(false_negative1)/len(positive_id)))
-        # print('false2_negative : %d / %d = %f'%(false_negative2,len(positive_id),float(false_negative2)/len(positive_id)))
     print('false1_positive : %d / %d'%(false_positive1,len(negative_id)))
     print('false2_positive : %d / %d'%(false_positive2,len(negative_id)))
     print('false1_negative : %d / %d'%(false_negative1,len(positive_id)))
@@ -235,30 +245,27 @@ if __name__ == '__main__':
     print(len(sus_tar2))
     print(len(sus_cro1))
     print(len(sus_cro2))
-    # print(sus_cro2)
-    # print(sus_tar2)
-    # print(sus_cro2)
     for bug_id in bug_id_list:
         lines = []
         for line_no in group[bug_id]['lineno']:
             lines.append(group[bug_id]['file']+'-'+str(line_no))
         print(lines)
         sus_analysis(lines,[sus_tar1,sus_tar2,sus_cro1,sus_cro2]) 
-    # sus_analysis(bug['lineno'],[sus_tar1,sus_tar2,sus_cro1,sus_cro2])
-    # print_line_info(all_lines,traces,bug['lineno'])
-    # print('-----------------------------------------')
+
+def mainRecord(config):
+    record_path = config['root_dir'] + 'experiment/'
+    record_files = [f for f in os.listdir(record_path) if f.startswith('start') ]
+    print(record_files)
+    for record_file in record_files:
+        print(record_file)
+        cfg = ConfigParser()
+        cfg.read(record_path+record_file)
+        temp = cfg.get('param','bug')[1:-1]
+        bug_id_list = [int(t.strip()) for t in temp.split(',')]
+        analysis(bug_id_list,)
+
+if __name__ == '__main__':
+    config = parserConfig()
+    mainRecord(config)
     
-    # for bug_id in bug_id_list:
-    #     bug = group[bug_id]
-    #     all_lines = statics(bug['file'])
-    #     print('bug id : %d'%bug_id)
-    #     print('bug file : %s'%bug['file'])
-    #     start = bug['start']
-    #     states,profiles = simulationResultClean(start,start+interval)
-    #     # states,profiles = simulationTiny(start,start+interval)
-    #     traces = executionTracesClean(bug['file'],start=start,end=start+interval)
-    #     # labels1,false1 = labelTraces_LR(start=start,end=end)
-    #     # labels2,false2 = labelTraces_LR1(start=start,end=end)
-    #     labels1,positive1 = labelTraces_LR(states,profiles)
-    #     labels2,positive2 = labelTraces_LR1(states,profiles)
         

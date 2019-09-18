@@ -2,7 +2,6 @@ import os
 from injector import *
 import time
 from runsimulation import *
-from runsimul_extend import run_sim_extend
 import random
 from ConfigParser import ConfigParser
 
@@ -17,6 +16,12 @@ def parserConfig():
     config['end'] = int(cfg.get('param','end'))
     config['rounds'] = int(cfg.get('param','rounds'))
     return config
+
+def writeConfig(cfg_name,bug_id_list):
+    cfg = ConfigParser()
+    cfg.read('monkey-copter/config.ini')
+    cfg.set('param','bug',str(bug_id_list))
+    cfg.write(open('experiment/'+cfg_name,'w'))
 
 def recoverAllFiles():
     for bug in bug_group:
@@ -49,6 +54,9 @@ def run(config):
 #     for i in bug_id_list:
 #         os.system('cp /home/cedric/Desktop/copterTest/0/' + group[i]['file'] + ' /home/cedric/Desktop/arduPilot/' + group[i]['file'])
     os.chdir(config['root_dir'])
+    cfg_name = 'start_'+str(start)+'.ini'
+    os.system('cp monkey-copter/config.ini experiment/'+cfg_name)
+    writeConfig(cfg_name,bug_id_list)
     os.system('make sitl -j4')
     time.sleep(15)
     os.system('cp build/sitl/bin/arducopter experiment/elf/0/ArduCopter.elf')
