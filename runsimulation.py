@@ -1,5 +1,5 @@
 from dronekit_sitl import SITL
-from dronekit import connect, APIException, VehicleMode
+from dronekit import connect, APIException, VehicleMode, LocationGlobalRelative, LocationGlobal, Command
 import time
 import numpy as np
 import pickle
@@ -8,6 +8,7 @@ from datatype import *
 from mission1 import *
 import sys
 from getopt import getopt, GetoptError
+from pymavlink import mavutil
 
 TOTAL_SIM_TIME = 40
 bug_id = 0
@@ -112,39 +113,115 @@ class SimRunner:
                     time.sleep(0.1)
                     current_t += 0.1
                 self.states.append(temp_state)
-        # while True:
-        #     if mission.is_completed(self):
-        #         self.mission_no += 1
-        #         classify_state.append(temp_state)
-        #         temp_state = []
-        #         if self.mission_no == len(self.missions):
-        #             break
-        #         mission = self.missions[self.mission_no]
-        #     mission.run(self)
-        #     # self.states.append([self.vehicle.mode.name,self.vehicle.location.global_frame,self.vehicle.attitude,self.vehicle.velocity])
-        #     self.states.append([self.vehicle.location.global_frame.lat,self.vehicle.location.global_frame.lon,self.vehicle.location.global_frame.alt
-        #     ,self.vehicle.attitude.pitch,self.vehicle.attitude.yaw,self.vehicle.attitude.roll,self.vehicle.velocity[0],self.vehicle.velocity[1],self.vehicle.velocity[2]])
-        #     temp_state.append([self.vehicle.location.global_frame.lat,self.vehicle.location.global_frame.lon,self.vehicle.location.global_frame.alt
-        #     ,self.vehicle.attitude.pitch,self.vehicle.attitude.yaw,self.vehicle.attitude.roll,self.vehicle.velocity[0],self.vehicle.velocity[1],self.vehicle.velocity[2]])
-        #     print_info(self.vehicle)
-        #     # print(self.current_time)
-        #     time.sleep(self.delta)
-        #     self.current_time += self.delta
         self.vehicle.close()
         self.sitl.stop()
-        # time.sleep(60)
 
-        # print("Saving states...")
-        # print(self.profiles)
-        # with open(exp_out_dir + "states_%s.txt"%self.sim_id,'w') as f:
-        #     for state in self.states:
-        #         # f.write(state[0] + '\n')
-        #         f.write('lat=%s,lon=%s,alt=%s\n'% (str(state[0]),str(state[1]),str(state[2])))
-        #         f.write('picth=%s,yaw=%s,roll=%s\n'% (str(state[3]),str(state[4]),str(state[5])))
-        #         f.write('velocity=[%f,%f,%f]\n'%(state[6],state[7],state[8]))
-                # f.write('lat:%s lon:%s alt:%s roll:%s pitch:%s yaw:%s'%(str(state[0]),str(state[1]),str(state[2]),str(state[3]),str(state[4]),str(state[5])))
-        # print(self.states)
-        # np.save(exp_out_dir + "states_np_%s" % self.sim_id, np.array(self.states))
+        np.save(self.exp_out_dir + "states_np_%s" % self.sim_id, np.array(self.states))
+        np.save(self.exp_out_dir + "profiles_np_%s" % self.sim_id, np.array(self.profiles))
+
+        print("Output Execution Path...")
+        with open(self.exp_out_dir + "raw_%s.txt" % self.sim_id, "w") as execution_file:
+            ep_line = self.sitl.stdout.readline(0.01)
+            while ep_line is not None:
+                execution_file.write(ep_line)
+                ep_line = self.sitl.stdout.readline(0.01)
+
+        self.sitl.p.stdout.close()
+        self.sitl.p.stderr.close()
+        print("Simulation %s completed." % self.sim_id)
+
+    def run1(self):
+        print('run1')
+        mission = self.missions[self.mission_no]
+        mission.run(self)
+        time.sleep(10)
+        self.current_time += 10
+        home_location = self.vehicle.location.global_frame
+        temp_state = []
+        # classify_state = []
+        waypoint_num = 3
+        T = 2
+        ## first mission : guided mode
+        for i in range(0,4):
+            current_location = self.vehicle.location.global_frame
+            if i % 2 == 0:
+                target_delta = [random.uniform(0.0002,0.0003)/waypoint_num,random.uniform(0.0002,0.0003)/waypoint_num,random.uniform(20,30)/waypoint_num]
+            else:
+                target_delta = [random.uniform(0.0002,0.0003)/waypoint_num,random.uniform(-0.0003,-0.0002)/waypoint_num,random.uniform(-30,-20)/waypoint_num]
+            for j in range(1,waypoint_num+1):
+                profile = LocationGlobal(current_location.lat+target_delta[0]*j,current_location.lon+target_delta[1]*j,current_location.alt+target_delta[2]*j)
+                self.profiles.append([profile.lat,profile.lon,profile.alt])
+                # self.profiles.append([profile.lat,profile.lon,profile.alt-current_location.alt+20])
+                self.vehicle.simple_goto(profile)
+                current_t = 0
+                temp_state = []
+                while current_t < T:
+                    # print_info(self.vehicle)
+                    temp_state.append([self.vehicle.location.global_frame.lat,self.vehicle.location.global_frame.lon,self.vehicle.location.global_frame.alt
+                    ,self.vehicle.attitude.pitch,self.vehicle.attitude.yaw,self.vehicle.attitude.roll,self.vehicle.velocity[0],self.vehicle.velocity[1],self.vehicle.velocity[2]])
+                    time.sleep(0.1)
+                    current_t += 0.1
+                self.states.append(temp_state)
+        
+        ## second mission : acro mode
+        self.vehicle.channels.overrides['1'] = 1400
+        self.vehicle.channels.overrides['2'] = 1400
+        self.vehicle.channels.overrides['3'] = 1500
+        self.vehicle.channels.overrides['4'] = 1500
+        self.vehicle.mode = VehicleMode('ACRO')
+        for i in range(0,waypoint_num):
+            current_location = self.vehicle.location.global_frame
+            self.profiles.append([current_location.lat,current_location.lon,current_location.alt])
+            current_t = 0
+            temp_state = []
+            while current_t < T:
+                self.vehicle.channels.overrides['3'] = 1500
+                temp_state.append([self.vehicle.location.global_frame.lat,self.vehicle.location.global_frame.lon,self.vehicle.location.global_frame.alt
+                    ,self.vehicle.attitude.pitch,self.vehicle.attitude.yaw,self.vehicle.attitude.roll,self.vehicle.velocity[0],self.vehicle.velocity[1],self.vehicle.velocity[2]])
+                time.sleep(0.1)
+                current_t += 0.1
+                # print_info(self.vehicle)
+            self.states.append(temp_state)
+        
+        ## third mission : auto mode
+        cmds = self.vehicle.commands
+        cmds.clear()
+        waypoint_in_auto = [random.uniform(0.0002,0.0003)/waypoint_num,random.uniform(0.0002,0.0003)/waypoint_num,random.uniform(20,30)/waypoint_num]
+        for j in range(1,waypoint_num+1):
+            profile = LocationGlobal(current_location.lat+target_delta[0]*j,current_location.lon+target_delta[1]*j,current_location.alt+target_delta[2]*j)
+            self.profiles.append([profile.lat,profile.lon,profile.alt])
+            cmds.add(Command(0,0,0,mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,mavutil.mavlink.MAV_CMD_NAV_WAYPOINT,0,0,0,0,0,0,profile.lat,profile.lon,profile.alt))
+        cmds.upload()
+        self.vehicle.commands.next = 0
+        self.vehicle.mode = VehicleMode('AUTO')
+        for j in range(0,waypoint_num):
+            current_t = 0
+            temp_state = []
+            while current_t < T:
+                # print_info(self.vehicle)
+                temp_state.append([self.vehicle.location.global_frame.lat,self.vehicle.location.global_frame.lon,self.vehicle.location.global_frame.alt
+                ,self.vehicle.attitude.pitch,self.vehicle.attitude.yaw,self.vehicle.attitude.roll,self.vehicle.velocity[0],self.vehicle.velocity[1],self.vehicle.velocity[2]])
+                time.sleep(0.1)
+                current_t += 0.1
+            self.vehicle.commands.next += 1
+            self.states.append(temp_state)
+
+        #### fourth mission : rtl mode
+        self.vehicle.mode = VehicleMode('RTL')
+        for j in range(0,waypoint_num):
+            self.profiles.append([home_location.lat,home_location.lon,home_location.alt])
+            current_t = 0
+            temp_state = []
+            while current_t < T:
+                # print_info(self.vehicle)
+                temp_state.append([self.vehicle.location.global_frame.lat,self.vehicle.location.global_frame.lon,self.vehicle.location.global_frame.alt
+                ,self.vehicle.attitude.pitch,self.vehicle.attitude.yaw,self.vehicle.attitude.roll,self.vehicle.velocity[0],self.vehicle.velocity[1],self.vehicle.velocity[2]])
+                time.sleep(0.1)
+                current_t += 0.1
+            self.states.append(temp_state)
+        self.vehicle.close()
+        self.sitl.stop()
+
         np.save(self.exp_out_dir + "states_np_%s" % self.sim_id, np.array(self.states))
         np.save(self.exp_out_dir + "profiles_np_%s" % self.sim_id, np.array(self.profiles))
 
@@ -160,52 +237,13 @@ class SimRunner:
         print("Simulation %s completed." % self.sim_id)
 
 
-def print_usage(filename):
-    print("Usage: %s --ardupilot_dir=path_to_elfs --out_dir=path_to_data_out_dir "
-          "-l PA/AB -i {bug_id} [-f {sim_from}] [-t {sim_to}] [-m {mission_loader_id}]" % filename)
-
-
-
-    # try:
-    #     opts, args = getopt(sys.argv[1:], 'hl:i:f:t:m:', ['ardupilot_dir=', 'out_dir=', 'help'])
-    # except GetoptError as e:
-    #     print_usage(sys.argv[0])
-    #     sys.exit(2)
-
-def run_sim(config):
+def run_sim(config,mission_no):
     sim_start = config['start']
     sim_end = config['end']
     
     sample_cnt = sim_start
     mission_loader_id = 1
     labeling_method = 'PA'
-    # for opt, arg in opts:
-    #     if opt in ['-h', '--help']:
-    #         print_usage(sys.argv[0])
-    #         sys.exit(0)
-    #     elif opt == '--ardupilot_dir':
-    #         ardupilot_dir = arg.strip()
-    #         if not ardupilot_dir.endswith('/'):
-    #             ardupilot_dir += '/'
-    #     elif opt == '--out_dir':
-    #         out_dir = arg.strip()
-    #         if not out_dir.endswith('/'):
-    #             out_dir += '/'
-    #     elif opt == '-f':
-    #         sample_cnt = int(arg)
-    #     elif opt == '-t':
-    #         sim_end = int(arg)
-    #     elif opt == '-m':
-    #         mission_loader_id = int(mission_loader_id) #####Cedric: bug???
-    #     elif opt == '-l':
-    #         labeling_method = arg
-    #     elif opt == '-i':
-    #         bug_id = int(arg)
-
-    if labeling_method is None or bug_id is None:
-        print_usage(sys.argv[0])
-        sys.exit(2)
-
     
     while sample_cnt < sim_end:
         print("simulation round %d-----------------------------------------\n" %sample_cnt)
@@ -214,26 +252,15 @@ def run_sim(config):
                 profiles_generated = generate_profiles(cluster=False)
             else:
                 profiles_generated = generate_profiles(cluster=False)
-            # profile_name = exp_out_dir+"profiles_%d.pckl" % sample_cnt
-            # with open(profile_name, 'w') as f: #Cedric: save profile
-            #     pickle.dump(profiles_generated, f)
             p = profiles_generated[0]
-            # profiles = []
-            # pre_des = p.home
-            # for i in range(0,len(p.targets)):
-            #     des = p.targets[i]
-            #     target_delta = [des.lat-pre_des.lat,des.lon-pre_des.lon,des.alt-pre_des.alt] / 5
-            #     for 
-            # profiles.append([[p.lat,p.lon,p.alt+20],[p.target1.lat,p.target1.lon,p.target1.alt],[p.target2.lat,p.target2.lon,p.target2.alt],
-            # [p.target3.lat,p.target3.lon,p.target3.alt],[p.target4.lat,p.target4.lon,p.target4.alt]])
-            # np.save(exp_out_dir + "profiles_np_%s" % sample_cnt, np.array(profiles))
-            # with open(profile_name) as f:
-            #     profiles = pickle.load(f) # load again?
             for core_cnt, profile in enumerate(profiles_generated):
                 state_data = []
                 sim = SimRunner(sample_cnt, core_cnt, profile,config)
                 if sim.ready:
-                    sim.run()
+                    if mission_no == 0:
+                        sim.run()
+                    else:
+                        sim.run1()
                 else:
                     print("Not ready for mission")
                     break

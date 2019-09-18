@@ -54,9 +54,9 @@ def run(config):
     os.system('cp build/sitl/bin/arducopter experiment/elf/0/ArduCopter.elf')
     time.sleep(3)
     if config['real_life'] and len(set([0,1,2]).intersection(set(bug_id_list))) != 0:
-        run_sim_extend(config)
+        run_sim(config,1)
     else:
-        run_sim(config)
+        run_sim(config,0)
 
 
 
