@@ -191,12 +191,12 @@ def analysis(cfg,bug_id_list):
     # print(all_lines)
     start = int(cfg.get('param','start'))
     end = int(cfg.get('param','end'))
-    traces = executionTracesClean(bug_id_list,group,start=start,end=end-1,cfg)
+    traces = executionTracesClean(bug_id_list,group,start,end-1,cfg)
     # print(all_lines)
     print(len(traces))
     for bug_id in bug_id_list:
         print(str(bug_id) + ':' + group[bug_id]['file'])
-    states,profiles = simulationResultClean(start,end-1)
+    states,profiles = simulationResultClean(cfg,start,end-1)
     labels1,positive1 = labelTraces_LR(states,profiles)
     labels2,positive2 = labelTraces_LR1(states,profiles)
     positive_id = set()
@@ -260,7 +260,7 @@ def mainRecord(config):
         cfg.read(record_path+record_file)
         temp = cfg.get('param','bug')[1:-1]
         bug_id_list = [int(t.strip()) for t in temp.split(',')]
-        analysis(bug_id_list,)
+        analysis(cfg,bug_id_list)
 
 if __name__ == '__main__':
     config = parserConfig()

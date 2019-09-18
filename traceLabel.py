@@ -13,8 +13,8 @@ p = 10
 AR_dimension = 3
 waypoint_num = 20
 
-def simulationResultClean(index_from,index_to):
-    dir = '/home/cedric/Desktop/arduPilot/experiment/output/PA/0/'
+def simulationResultClean(cfg,index_from,index_to):
+    dir = cfg.get('param','root_dir')+'experiment/output/PA/0/'
     states = []
     profiles = []
     for simulate_id in range(index_from,index_to+1):
