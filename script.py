@@ -72,6 +72,6 @@ if __name__ == '__main__':
     config = parserConfig()
     interval = config['end'] - config['start']
     for i in range(0,config['rounds']):
+        run(config)
         config['start'] += interval
         config['end'] += interval
-        run(config)
