@@ -61,7 +61,7 @@ def run(config):
     time.sleep(15)
     os.system('cp build/sitl/bin/arducopter experiment/elf/0/ArduCopter.elf')
     time.sleep(3)
-    if config['real_life'] and len(set([0,1,2]).intersection(set(bug_id_list))) != 0:
+    if config['real_life'] == 'True' and len(set([0,1,2]).intersection(set(bug_id_list))) != 0:
         run_sim(config,1)
     else:
         run_sim(config,0)
@@ -72,6 +72,6 @@ if __name__ == '__main__':
     config = parserConfig()
     interval = config['end'] - config['start']
     for i in range(0,config['rounds']):
-        config['start'] += i * interval
-        config['end'] += i * interval
+        config['start'] += interval
+        config['end'] += interval
         run(config)
