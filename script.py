@@ -41,14 +41,6 @@ def run(config):
     print(bug_id_list)
     start = config['start']
     end = config['end']
-    with open('%s/record_start=%d.txt'%(config['root_dir']+'experiment',config['start']),'w') as f:
-        f.write('real_life : ' + config['real_life'] + '\n')
-        f.write('mutiple_bugs : ' + config['mutiple_bugs'] + '\n')
-        f.write('bug id : ')
-        for id in bug_id_list:
-            f.write(str(id) + ' ')
-        f.write('\n')
-        f.write('start : %d, end : %d'%(start,end))
     recoverAllFiles()
     inject_bugs(bug_id_list,config)
 #     for i in bug_id_list:
