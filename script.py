@@ -17,10 +17,12 @@ def parserConfig():
     config['rounds'] = int(cfg.get('param','rounds'))
     return config
 
-def writeConfig(cfg_name,bug_id_list):
+def writeConfig(cfg_name,bug_id_list,start,end):
     cfg = ConfigParser()
     cfg.read('monkey-copter/config.ini')
     cfg.set('param','bug',str(bug_id_list))
+    cfg.set('param','start',str(start))
+    cfg.set('param','end',str(end))
     cfg.write(open('experiment/'+cfg_name,'w'))
 
 def recoverAllFiles():
@@ -48,7 +50,7 @@ def run(config):
     os.chdir(config['root_dir'])
     cfg_name = 'start_'+str(start)+'.ini'
     os.system('cp monkey-copter/config.ini experiment/'+cfg_name)
-    writeConfig(cfg_name,bug_id_list)
+    writeConfig(cfg_name,bug_id_list,start,end)
     os.system('make sitl -j4')
     time.sleep(15)
     os.system('cp build/sitl/bin/arducopter experiment/elf/0/ArduCopter.elf')
