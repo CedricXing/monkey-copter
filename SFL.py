@@ -70,8 +70,8 @@ def tarantula(all_lines,traces,labels):
             suspici = failed / total_failed / (passed/total_passed+failed/total_failed)
         suspicious.append([suspici,line])
     suspicious.sort(reverse=True)
-    # return suspicious
-    return compressSameValue(suspicious)
+    return suspicious
+    #return compressSameValue(suspicious)
     
 
 def crosstab(all_lines,traces,labels):
@@ -136,8 +136,8 @@ def crosstab(all_lines,traces,labels):
         else:
             suspicious.append([-M,line])
     suspicious.sort(reverse=True)
-    # return suspicious
-    return compressSameValue(suspicious)
+    return suspicious
+    #return compressSameValue(suspicious)
     
 def print_line_info(all_lines,traces,lineno):
     result = []
@@ -208,7 +208,7 @@ def analysis(cfg,bug_id_list):
                     positive_id.add(i)
                     break
     positive_id = list(positive_id)
-    print(positive_id)
+    print('positive traces : ' + str(len(positive_id)))
     negative_id = []
     for i in range(0,len(traces)):
         if i not in positive_id:
