@@ -236,8 +236,8 @@ def analysis(cfg,bug_id_list):
     print('false2_negative : %d / %d'%(false_negative2,len(positive_id)))
 
     sus_tar1 = tarantula(all_lines,traces,labels1)
-    sus_cro1 = crosstab(all_lines,traces,labels1)
     sus_tar2 = tarantula(all_lines,traces,labels2)
+    sus_cro1 = crosstab(all_lines,traces,labels1)
     sus_cro2 = crosstab(all_lines,traces,labels2)
     print(len(sus_tar1))
     print(len(sus_tar2))
