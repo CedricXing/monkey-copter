@@ -138,7 +138,7 @@ def labelTraces_LR(states=None,profiles=None,dir=None,start=0,end=1):
     print('total traces:%d'%len(states))
     print('positive labels:%d'%(len(states)-true_labels))
     # print('true labels:%d'%true_labels)
-    print(false_id)
+    #print(false_id)
     return labels,false_id
 
 def labelTraces_LR1(states=None,profiles=None,dir=None,start=0,end=1):
@@ -173,7 +173,7 @@ def labelTraces_LR1(states=None,profiles=None,dir=None,start=0,end=1):
     print('total traces:%d'%len(states))
     # print('true labels:%d'%true_labels)
     print('positive labels:%d'%(len(states)-true_labels))
-    print(false_id)
+    #print(false_id)
     return labels,false_id
 
 # def labelTraces_LR1(states=None,profiles=None,dir=None,start=0,end=1):

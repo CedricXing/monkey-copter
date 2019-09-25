@@ -208,7 +208,7 @@ def analysis(cfg,bug_id_list):
                     positive_id.add(i)
                     break
     positive_id = list(positive_id)
-    print('positive traces : ' + str(len(positive_id)))
+    print('ground truth : ' + str(len(positive_id)))
     negative_id = []
     for i in range(0,len(traces)):
         if i not in positive_id:
