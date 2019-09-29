@@ -188,8 +188,6 @@ def test_labelTraces(states=None,profiles=None,dir=None,start=0,end=1):
         profile = profiles[simulate_id]
         label = True
         for mission_id in range(0,len(profile)):
-            if mission_id > 0 and mission_id % 3 == 0:
-                continue
             state_temp = state[mission_id]
             profile_temp = profile[mission_id][:AR_dimension]
             if not LinearRegressionBasedLabel(state_temp,profile_temp,mission_id):
