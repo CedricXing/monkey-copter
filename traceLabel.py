@@ -176,6 +176,44 @@ def labelTraces_LR1(states=None,profiles=None,dir=None,start=0,end=1):
     #print(false_id)
     return labels,false_id
 
+def test_labelTraces(states=None,profiles=None,dir=None,start=0,end=1):
+    true_labels = 0
+    labels = []
+    false_id = []
+    false_labels_curve = 0
+    false_labels_stable = 0
+    for simulate_id,state in enumerate(states):
+        curve_label = True
+        stable_label = True
+        profile = profiles[simulate_id]
+        label = True
+        for mission_id in range(0,len(profile)):
+            if mission_id > 0 and mission_id % 3 == 0:
+                continue
+            state_temp = state[mission_id]
+            profile_temp = profile[mission_id][:AR_dimension]
+            if not LinearRegressionBasedLabel(state_temp,profile_temp,mission_id):
+                label = False
+                if mission_id > 0 and mission_id % 3 == 0:
+                    curve_label = False
+                else:
+                    stable_label = False
+        if label:
+            true_labels += 1
+            labels.append(0)
+        else:
+            labels.append(1)
+            false_id.append(simulate_id)
+        if not curve_label and stable_label:
+            false_labels_curve += 1
+        if not stable_label and curve_label:
+            false_labels_stable += 1
+    print('total traces:%d'%len(states))
+    print('positive labels:%d'%(len(states)-true_labels))
+    print('false_curve_labels:%d'%false_labels_curve)
+    print('false_stable_labels:%d'%false_labels_stable)
+    return labels,false_id
+
 # def labelTraces_LR1(states=None,profiles=None,dir=None,start=0,end=1):
 #     # dir = '/home/cedric/ArduPilot/experiment/output/PA/0/'
 #     # states,profiles = simulationResultClean(dir,start,end)

@@ -197,6 +197,8 @@ def analysis(cfg,bug_id_list):
     for bug_id in bug_id_list:
         print(str(bug_id) + ':' + group[bug_id]['file'])
     states,profiles = simulationResultClean(cfg,start,end-1)
+    labels,positives = test_labelTraces(states,profiles)
+    return
     labels1,positive1 = labelTraces_LR(states,profiles)
     labels2,positive2 = labelTraces_LR1(states,profiles)
     positive_id = set()
