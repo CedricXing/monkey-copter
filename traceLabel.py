@@ -206,10 +206,13 @@ def test_labelTraces(states=None,profiles=None,dir=None,start=0,end=1):
             false_labels_curve += 1
         if not stable_label and curve_label:
             false_labels_stable += 1
+    false_nums = len(states) - true_labels
     print('total traces:%d'%len(states))
-    print('positive labels:%d'%(len(states)-true_labels))
-    print('false_curve_labels:%d'%false_labels_curve)
-    print('false_stable_labels:%d'%false_labels_stable)
+    print('positive labels:%d'%false_nums)
+    print('false_curve_labels:%d, proportion : %f'%(false_labels_curve,float(false_labels_curve)/false_nums))
+    print('false_stable_labels:%d, proportion : %f'%(false_labels_stable,float(false_labels_stable)/false_nums))
+    print('simultaneously false labels:%d, proportion : %f'%(false_nums - false_labels_curve-false_labels_stable,float(false_nums-false_labels_curve-false_labels_stable)/false_nums))
+
     return labels,false_id
 
 # def labelTraces_LR1(states=None,profiles=None,dir=None,start=0,end=1):
