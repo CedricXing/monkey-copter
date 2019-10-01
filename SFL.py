@@ -159,14 +159,22 @@ def print_line_info(all_lines,traces,lineno):
     result.sort(reverse=True)
     print(result)
 
-def sus_analysis(lines,sus_list):
+def sus_analysis(lines,sus_list,output_f):
     for sus in sus_list:
+        result = []
         if sus == None:
             continue
-        for i in range(0,len(sus)):
-            for line in lines:
-                if line in sus[i][1]:
-                    print('line no %s rank #%d sus : %f'%(line,i,sus[i][0]))
+        for line_nos in lines:
+            min_rank = 10000
+            for line in line_nos:
+                for i in range(0,len(sus)):
+                    if line in sus[i][1]:
+                        print('line no %s rank #%d sus : %f'%(line,i,sus[i][0]))
+                        if i < min_rank:
+                            min_rank = i
+            if min_rank != 10000:
+                result.append(min_rank)
+        output_f.write(str(result)+'\n')
     print('~~~~~~~~~~~')
 
 def parserConfig():
@@ -181,7 +189,7 @@ def parserConfig():
     config['rounds'] = int(cfg.get('param','rounds'))
     return config
 
-def analysis(cfg,bug_id_list):
+def analysis(cfg,bug_id_list,output_f):
     if cfg.get('param','real_life') == 'True':
         group = real_life_bug_group
     else:
@@ -240,40 +248,48 @@ def analysis(cfg,bug_id_list):
     # print('false2_negative : %d / %d'%(false_negative2,len(positive_id)))
     if len(negative_id) != 0:
         print('false positive rate1 : %f'%(float(false_positive1)/len(negative_id)))
+        output_f.write('fpr1 : %f\n'%(float(false_positive1)/len(negative_id)))
         # print('false positive rate2 : %f'%(float(false_positive2)/len(negative_id)))
     else:
         print('false positive rate1 : None')
+        output_f.write('fpr1 : None\n')
         # print('false positive rate2 : None')
     if len(positive_id) != 0:
         print('false negative rate1 : %f'%(float(false_negative1)/len(positive_id)))
+        output_f.write('fnr1 : %f\n'%(float(false_negative1)/len(positive_id)))
         # print('false negative rate2 : %f'%(float(false_negative2)/len(positive_id)))
     else:
         print('false negative rate1 : None')
+        output_f.write('fnr1 : None\n')
         # print('false negative rate2 : None')
     sus_tar1 = tarantula(all_lines,traces,labels1)
     # sus_tar2 = tarantula(all_lines,traces,labels2)
     sus_cro1 = crosstab(all_lines,traces,labels1)
     # sus_cro2 = crosstab(all_lines,traces,labels2)
 
+    lines = []
     for bug_id in bug_id_list:
-        lines = []
+        temps = []
         for line_no in group[bug_id]['lineno']:
-            lines.append(group[bug_id]['file']+'-'+str(line_no))
-        print(lines)
-        # sus_analysis(lines,[sus_tar1,sus_tar2,sus_cro1,sus_cro2]) 
-        sus_analysis(lines,[sus_tar1,sus_cro1]) 
+            temps.append(group[bug_id]['file']+'-'+str(line_no))
+        lines.append(temps)
+    print(lines)
+    # sus_analysis(lines,[sus_tar1,sus_tar2,sus_cro1,sus_cro2]) 
+    sus_analysis(lines,[sus_tar1,sus_cro1],output_f) 
 
 def mainRecord(config):
     record_path = config['root_dir'] + 'experiment/'
     record_files = [f for f in os.listdir(record_path) if f.startswith('start') ]
     print(record_files)
+    output_f = open('real_1_6.log','w')
     for record_file in record_files:
         print(record_file)
         cfg = ConfigParser()
         cfg.read(record_path+record_file)
         temp = cfg.get('param','bug')[1:-1]
         bug_id_list = [int(t.strip()) for t in temp.split(',')]
-        analysis(cfg,bug_id_list)
+        analysis(cfg,bug_id_list,output_f)
+        output_f.write('------')
 
 if __name__ == '__main__':
     config = parserConfig()
