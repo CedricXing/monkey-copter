@@ -190,15 +190,17 @@ def analysis(cfg,bug_id_list):
     all_lines = statics(bug_id_list,group,cfg)
     # print(all_lines)
     start = int(cfg.get('param','start'))
-    end = int(cfg.get('param','end'))
+    ##### test std : end = start + 200
+    # end = int(cfg.get('param','end'))
+    end = start + 200
     traces = executionTracesClean(bug_id_list,group,start,end-1,cfg)
     # print(all_lines)
     print(len(traces))
     for bug_id in bug_id_list:
         print(str(bug_id) + ':' + group[bug_id]['file'])
     states,profiles = simulationResultClean(cfg,start,end-1)
-    labels,positives = test_labelTraces(states,profiles)
-    return
+    # labels,positives = test_labelTraces(states,profiles)
+    # return
     labels1,positive1 = labelTraces_LR(states,profiles)
     labels2,positive2 = labelTraces_LR1(states,profiles)
     positive_id = set()
@@ -232,25 +234,34 @@ def analysis(cfg,bug_id_list):
         if i not in positive2 and i in positive_id:
             false_negative2 += 1
 
-    print('false1_positive : %d / %d'%(false_positive1,len(negative_id)))
-    print('false2_positive : %d / %d'%(false_positive2,len(negative_id)))
-    print('false1_negative : %d / %d'%(false_negative1,len(positive_id)))
-    print('false2_negative : %d / %d'%(false_negative2,len(positive_id)))
-
+    # print('false1_positive : %d / %d'%(false_positive1,len(negative_id)))
+    # print('false2_positive : %d / %d'%(false_positive2,len(negative_id)))
+    # print('false1_negative : %d / %d'%(false_negative1,len(positive_id)))
+    # print('false2_negative : %d / %d'%(false_negative2,len(positive_id)))
+    if len(negative_id) != 0:
+        print('false positive rate1 : %f'%float(false_positive1)/len(negative_id))
+        # print('false positive rate2 : %f'%float(false_positive2)/len(negative_id))
+    else:
+        print('false positive rate1 : None')
+        # print('false positive rate2 : None')
+    if len(positive_id) != 0:
+        print('false negative rate1 : %f'%float(false_negative1)/len(positive_id))
+        # print('false negative rate2 : %f'%float(false_negative2)/len(positive_id))
+    else:
+        print('false negative rate1 : None')
+        # print('false negative rate2 : None')
     sus_tar1 = tarantula(all_lines,traces,labels1)
-    sus_tar2 = tarantula(all_lines,traces,labels2)
+    # sus_tar2 = tarantula(all_lines,traces,labels2)
     sus_cro1 = crosstab(all_lines,traces,labels1)
-    sus_cro2 = crosstab(all_lines,traces,labels2)
-    print(len(sus_tar1))
-    print(len(sus_tar2))
-    print(len(sus_cro1))
-    print(len(sus_cro2))
+    # sus_cro2 = crosstab(all_lines,traces,labels2)
+
     for bug_id in bug_id_list:
         lines = []
         for line_no in group[bug_id]['lineno']:
             lines.append(group[bug_id]['file']+'-'+str(line_no))
         print(lines)
-        sus_analysis(lines,[sus_tar1,sus_tar2,sus_cro1,sus_cro2]) 
+        # sus_analysis(lines,[sus_tar1,sus_tar2,sus_cro1,sus_cro2]) 
+        sus_analysis(lines,[sus_tar1,sus_cro1]) 
 
 def mainRecord(config):
     record_path = config['root_dir'] + 'experiment/'
