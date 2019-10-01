@@ -239,14 +239,14 @@ def analysis(cfg,bug_id_list):
     # print('false1_negative : %d / %d'%(false_negative1,len(positive_id)))
     # print('false2_negative : %d / %d'%(false_negative2,len(positive_id)))
     if len(negative_id) != 0:
-        print('false positive rate1 : %f'%float(false_positive1)/len(negative_id))
-        # print('false positive rate2 : %f'%float(false_positive2)/len(negative_id))
+        print('false positive rate1 : %f'%(float(false_positive1)/len(negative_id)))
+        # print('false positive rate2 : %f'%(float(false_positive2)/len(negative_id)))
     else:
         print('false positive rate1 : None')
         # print('false positive rate2 : None')
     if len(positive_id) != 0:
-        print('false negative rate1 : %f'%float(false_negative1)/len(positive_id))
-        # print('false negative rate2 : %f'%float(false_negative2)/len(positive_id))
+        print('false negative rate1 : %f'%(float(false_negative1)/len(positive_id)))
+        # print('false negative rate2 : %f'%(float(false_negative2)/len(positive_id)))
     else:
         print('false negative rate1 : None')
         # print('false negative rate2 : None')
