@@ -289,7 +289,7 @@ def mainRecord(config):
         temp = cfg.get('param','bug')[1:-1]
         bug_id_list = [int(t.strip()) for t in temp.split(',')]
         analysis(cfg,bug_id_list,output_f)
-        output_f.write('------')
+        output_f.write('------\n')
 
 if __name__ == '__main__':
     config = parserConfig()
