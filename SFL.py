@@ -163,6 +163,7 @@ def sus_analysis(lines,sus_list,output_f):
     for sus in sus_list:
         result = []
         if sus == None:
+            output_f.write(str(result)+'\n')
             continue
         for line_nos in lines:
             min_rank = 10000
