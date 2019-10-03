@@ -292,7 +292,7 @@ def mainRecord(config,std):
     output_f2 = open('real_1_' + str(std) + '_1.log2','w')
     for record_file in record_files:
         print(record_file)
-        if '20000' in record_file or '23000' in record_file or '26000' in record_file:
+        if '20000' in record_file or '23000' in record_file or '26000' in record_file or '22000' in record_file or '24000' in record_file:
             continue
         cfg = ConfigParser()
         cfg.read(record_path+record_file)
