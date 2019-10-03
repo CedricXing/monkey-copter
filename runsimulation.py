@@ -91,17 +91,15 @@ class SimRunner:
         self.current_time += 10
         temp_state = []
         # classify_state = []
-        waypoint_num = 5
+        waypoint_num = 3
         T = 2
-        for i in range(0,2):
+        for i in range(0,4):
             current_location = self.vehicle.location.global_frame
             if i % 2 == 0:
                 target_delta = [random.uniform(0.0002,0.0003)/waypoint_num,random.uniform(0.0002,0.0003)/waypoint_num,random.uniform(20,30)/waypoint_num]
             else:
                 target_delta = [random.uniform(0.0002,0.0003)/waypoint_num,random.uniform(-0.0003,-0.0002)/waypoint_num,random.uniform(-30,-20)/waypoint_num]
             for j in range(1,waypoint_num+1):
-                if i == 1 and j == 2:
-                    break
                 profile = LocationGlobal(current_location.lat+target_delta[0]*j,current_location.lon+target_delta[1]*j,current_location.alt+target_delta[2]*j)
                 self.profiles.append([profile.lat,profile.lon,profile.alt])
                 # self.profiles.append([profile.lat,profile.lon,profile.alt-current_location.alt+20])
