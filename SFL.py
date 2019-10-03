@@ -190,7 +190,7 @@ def parserConfig():
     config['rounds'] = int(cfg.get('param','rounds'))
     return config
 
-def analysis(cfg,bug_id_list,output_f1,output_f2):
+def analysis(cfg,bug_id_list,output_f1,output_f2,std):
     if cfg.get('param','real_life') == 'True':
         group = real_life_bug_group
     else:
@@ -210,8 +210,8 @@ def analysis(cfg,bug_id_list,output_f1,output_f2):
     states,profiles = simulationResultClean(cfg,start,end-1)
     # labels,positives = test_labelTraces(states,profiles)
     # return
-    labels1,positive1 = labelTraces_LR(states,profiles)
-    labels2,positive2 = labelTraces_LR1(states,profiles)
+    labels1,positive1 = labelTraces_LR(states,profiles,std)
+    labels2,positive2 = labelTraces_LR1(states,profiles,std)
     positive_id = set()
     for i in range(0,len(traces)):
         for bug_id in bug_id_list:
@@ -284,24 +284,27 @@ def analysis(cfg,bug_id_list,output_f1,output_f2):
     sus_analysis(lines,[sus_tar1,sus_cro1],output_f1)
     sus_analysis(lines,[sus_tar2,sus_cro2],output_f2)
 
-def mainRecord(config):
+def mainRecord(config,std):
     record_path = config['root_dir'] + 'experiment/'
     record_files = [f for f in os.listdir(record_path) if f.startswith('start') ]
     print(record_files)
-    output_f1 = open('real_1_6_1.log1','w')
-    output_f2 = open('real_1_6_1.log2','w')
+    output_f1 = open('real_1_' + str(std) + '_1.log1','w')
+    output_f2 = open('real_1_' + str(std) + '_1.log2','w')
     for record_file in record_files:
         print(record_file)
+        if '20000' in record_file or '23000' in record_file or '26000' in record_file:
+            continue
         cfg = ConfigParser()
         cfg.read(record_path+record_file)
         temp = cfg.get('param','bug')[1:-1]
         bug_id_list = [int(t.strip()) for t in temp.split(',')]
-        analysis(cfg,bug_id_list,output_f1,output_f2)
+        analysis(cfg,bug_id_list,output_f1,output_f2,std)
         output_f1.write('------\n')
         output_f2.write('------\n')
 
 if __name__ == '__main__':
     config = parserConfig()
-    mainRecord(config)
+    for std in [4,5,6,7,8,9,10]:
+        mainRecord(config,std)
     
         

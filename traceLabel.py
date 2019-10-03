@@ -98,7 +98,7 @@ def compute_divergence(traces):
         divergences.append(divergence)
     return divergences
 
-def labelTraces_LR(states=None,profiles=None,dir=None,start=0,end=1):
+def labelTraces_LR(states=None,profiles=None,std=6):
     # dir = '/home/cedric/ArduPilot/experiment/output/PA/0/'
     # states,profiles = simulationResultClean(dir,start,end)
     true_labels = 0
@@ -120,7 +120,7 @@ def labelTraces_LR(states=None,profiles=None,dir=None,start=0,end=1):
             profile_temp = profile[mission_id][:AR_dimension]
             # print(state_temp)
             # print(profile_temp)
-            if not LinearRegressionBasedLabel(state_temp,profile_temp,mission_id):
+            if not LinearRegressionBasedLabel(state_temp,profile_temp,std=std):
                 label = False
                 # print(mission_id)
                 # print(simulate_id)
@@ -141,7 +141,7 @@ def labelTraces_LR(states=None,profiles=None,dir=None,start=0,end=1):
     #print(false_id)
     return labels,false_id
 
-def labelTraces_LR1(states=None,profiles=None,dir=None,start=0,end=1):
+def labelTraces_LR1(states=None,profiles=None,std=6):
     # dir = '/home/cedric/ArduPilot/experiment/output/PA/0/'
     # states,profiles = simulationResultClean(dir,start,end)
     true_labels = 0
@@ -155,7 +155,7 @@ def labelTraces_LR1(states=None,profiles=None,dir=None,start=0,end=1):
             # print(state_temp)
             # exit(0)
             profile_temp = profile[mission_id][:AR_dimension]
-            if not LinearRegressionBasedLabel(state_temp,profile_temp):
+            if not LinearRegressionBasedLabel(state_temp,profile_temp,std=std):
             # if not AR_based(state_temp,profile_temp):
                 label = False
                 # print(mission_id)
@@ -352,13 +352,13 @@ def labelTraces_AR1(states=None,profiles=None,dir=None,start=0,end=1):
     print(false_id)
     return labels,false_id
 
-def check_outlier_AR_based(errors):
+def check_outlier_AR_based(errors,std=6):
     if len(errors) <= 4:
         return True
     # print(len(errors))
     means = np.mean(errors[1:-1],axis=0)
     stds = np.std(errors[1:-1],axis=0)
-    std_n = 6
+    std_n = std
     # print(stds)
     for i in range(len(means)):
         if errors[-1][i] > means[i] + std_n * stds[i] or errors[-1][i] < means[i] - std_n * stds[i]:
@@ -430,25 +430,6 @@ def AR_based(state,profile=None):
         
         # print(predictions[-1][2])
         if not check_outlier_AR_based(errors):
-            # print('train')
-            # print(train)
-            # print('test')
-            # print(test)
-            # # print('-----------------------------')
-            # print(t)
-            # print(test[t-1])
-            # print(test[t])
-            # print(prediction)
-            # print(predictions)
-            # print(predictions[-2])
-            # for pos,data in enumerate(test):
-            #     print(pos)
-            #     print(data)
-            # print(prediction)
-            # print(train)
-            # exit(0)
-            # if len(state) == 15:
-            #     print('--------------------------------------------------------------------')
             return False
         # print('predicted=%f, expected=%f'%(yhat,obs))
     return True
@@ -519,17 +500,6 @@ def computeYk(k,state,U):
     Yk = np.transpose(Yk)
     return Yk.reshape(n*p+q,1)
 
-def check_outlier(X_est,state):
-    divergence = X_est.A1 - state
-    # print(X_est.A1)
-    # print(state)
-    # print(divergence)
-    # print('--------------------------------------------')
-    
-    if abs(divergence[0]) > 0.1 or abs(divergence[1] > 0.1) or abs(divergence[2]) > 5:
-        return False
-    return True
-
 def check_outlier_new(X_est,state,errors):
     # divergence = state - X_est.A1
     divergence = X_est.A1 - state
@@ -545,13 +515,6 @@ def check_outlier_new(X_est,state,errors):
     # print(errors)
     means = np.mean(errors,axis=0)
     stds = np.std(errors,axis=0)
-    # print(means)
-    # print(stds)
-    # errors.append(divergence)
-    # print(means-std_n*stds)
-    # print(divergence)
-    # print(means+std_n*stds)
-    # print('--------------------------------------------')
     if divergence[0] > means[0] + std_n*stds[0] or divergence[0] < means[0] - std_n*stds[0] or divergence[1] > means[1] + std_n*stds[1] or divergence[1] < means[1] - std_n*stds[1] or divergence[2] > means[2] + std_n*stds[2] or divergence[2] < means[2] - std_n*stds[2]:
         # print(means-std_n*stds)
         # print(divergence)
@@ -560,9 +523,8 @@ def check_outlier_new(X_est,state,errors):
         return False
     return True
 
-def LinearRegressionBasedLabel(state,profile,mission_id=0):
+def LinearRegressionBasedLabel(state,profile,std=6):
     state = np.array(state)
-    # print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
     labels = []
     i = p
     lambd = 0.95
@@ -582,68 +544,16 @@ def LinearRegressionBasedLabel(state,profile,mission_id=0):
         errors.append(X_est.A1 - state[i])
         Yk = computeYk(i,state,U)
         YkT = np.transpose(Yk)
-        # print(X_est.A1)
-        # print(state[i])
-        # print('------------------------')
-        if not check_outlier_AR_based(errors):
-            # exit(0)
-            # print('mission_id:%d'%mission_id)
-            # print(i)
-            # flag = False
+        if not check_outlier_AR_based(errors,std):
             return False
         X_i = np.concatenate((state[i].reshape(n,1),math.sqrt(lambd)*X_i),axis=1)
         Y_i = np.concatenate((Yk,math.sqrt(lambd)*Y_i),axis=1)
         psi_i = lambd*psi_i + np.mat(state[i].reshape(n,1))*np.mat(YkT)
         phi_i = lambd*phi_i + np.mat(Yk)*np.mat(YkT)
-        # phi_i_inv = pinv(phi_i)
-        # print(cond(phi_i))
         phi_i_inv = phi_i_inv / lambd - math.pow(lambd,-2)*np.mat(phi_i_inv)*np.mat(Yk)*inv(np.mat(np.identity(1)+np.mat(YkT)*np.mat(phi_i_inv)*np.mat(Yk)/lambd))*np.mat(YkT)*np.mat(phi_i_inv)
         A_i = np.mat(psi_i)*np.mat(phi_i_inv)
         i += 1
-    # print(len(errors))
-    # np.save("errors_50_%d"%mission_id, np.array(errors))
-    # if flag == False:
-    #     exit(0)
-    # exit(0)
     return True
-
-
-def LinearRegressionBasedLabel1(state,profile):
-    state = np.array(state)
-    labels = []
-    i = p
-    lambd = 0.99
-    U = profile[0]
-    X_i = state[p-1].reshape(n,1)
-    Yk = computeYk(p,state,U)
-    Y_i = Yk
-    psi_i = np.random.random((n,n*p+q))
-    phi_i = np.identity(n*p+q)
-    phi_i_inv = inv(phi_i)
-    A_i = np.mat(psi_i)*np.mat(phi_i_inv)
-    errors = []
-    
-    while i < len(state):
-    # while i < 14:
-        Yk = computeYk(i,state,profile[i])
-        YkT = np.transpose(Yk)
-        X_est = np.mat(A_i)*np.mat(Yk)
-        errors.append(X_est.A1-state[i])
-        if not check_outlier_AR_based(errors):
-            # print(i)
-            # print(state[i])
-            # print(X_est)
-            # print('-------------------------------------------------------------------------------------------')
-            return False
-        X_i = np.concatenate((np.array(state[i]).reshape(n,1),math.sqrt(lambd)*X_i),axis=1)
-        Y_i = np.concatenate((Yk,math.sqrt(lambd)*Y_i),axis=1)
-        psi_i = lambd*psi_i + np.mat(state[i].reshape(n,1))*np.mat(YkT)
-        phi_i = lambd*phi_i + np.mat(Yk)*np.mat(YkT)
-        # phi_i_inv = pinv(phi_i)
-        phi_i_inv = phi_i_inv / lambd - math.pow(lambd,-2)*np.mat(phi_i_inv)*np.mat(Yk)*inv(np.mat(np.identity(1)+np.mat(YkT)*np.mat(phi_i_inv)*np.mat(Yk)/lambd))*np.mat(YkT)*np.mat(phi_i_inv)
-        A_i = np.mat(psi_i)*np.mat(phi_i_inv)
-        i += 1
-    return True        
 
 if __name__ == '__main__':
     # dir = '/home/cedric/ArduPilot/experiment/output/PA/0/'
