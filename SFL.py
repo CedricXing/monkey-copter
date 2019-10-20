@@ -1,6 +1,11 @@
 from traceLabel import *
 from injector import *
-from ConfigParser import ConfigParser
+from configparser import ConfigParser
+import torch
+import torch.nn as nn
+import torchvision
+import torchvision.transforms as transforms
+import numpy as np
 
 def statics(bug_id_list,group,cfg):
     all_lines = set()
@@ -45,6 +50,86 @@ def compressSameValue(suspicious):
         else:
             sus[-1][1].append(element[1])
     return sus
+
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+learning_rate = 0.00000001
+
+class NeuralNet(nn.Module):
+    def __init__(self,input_size,hidden_size,num_classes):
+        super(NeuralNet,self).__init__()
+        self.fc1 = nn.Linear(input_size,hidden_size)
+        self.sigmoid = nn.Sigmoid()
+        self.fc2 = nn.Linear(hidden_size,num_classes)
+    
+    def forward(self, x):
+        out = self.fc1(x)
+        out = self.sigmoid(out)
+        out = self.fc2(out)
+        return out
+
+class BPNN_Dataset(torch.utils.data.Dataset):
+    def __init__(self,all_lines,traces,labels,transform,train):
+        if train:
+            self.data = torch.zeros((len(traces),len(all_lines)))
+            for i,trace in enumerate(traces):
+                for j,line in enumerate(all_lines):
+                    if line in trace:
+                        self.data[i][j] = 1.0
+            self.labels = torch.zeros((len(labels),1),dtype=torch.float)
+            for i,label in enumerate(labels):
+                if labels[i] == 1:
+                    self.labels[i][0] = 1.0
+        else:
+            self.data = torch.eye(len(all_lines))
+            self.labels = torch.zeros((len(all_lines),1))
+        self.transform = transform
+    
+    def __getitem__(self,index):
+        # print(self.data[index])
+        return self.data[index], self.labels[index]
+
+    def __len__(self):
+        return len(self.data)
+
+def BPNN(all_lines,traces,labels):
+    num_epochs = 5
+    batch_size = 10
+    train_data = BPNN_Dataset(all_lines,traces,labels,transform=transforms.ToTensor(),train=True)
+    train_loader = torch.utils.data.DataLoader(dataset=train_data,batch_size=batch_size,shuffle=True)
+    test_data = BPNN_Dataset(all_lines,traces,labels,transform=transforms.ToTensor(),train=False)
+    test_loader = torch.utils.data.DataLoader(dataset=test_data,batch_size=1,shuffle=False)
+    model = NeuralNet(len(all_lines),3,1).to(device)
+    criterion = nn.MSELoss()
+    # optimizer = torch.optim.SGD(model.parameters(),lr=learning_rate)
+    optimizer = torch.optim.Adam(model.parameters(),lr=learning_rate)
+
+    ### train the network
+    
+    for epoch in range(num_epochs):
+        for i,(data,label) in enumerate(train_loader):
+            data = data.to(device)
+            label = label.to(device)
+
+            outputs = model(data)
+            # print(outputs)
+            # print(label)
+            loss = criterion(outputs,label)
+
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+
+            if (i+1) % 1 == 0:
+                print('Epoch [{}/{}], Step[{}/{}], Loss: {:.4f}'.format(epoch+1,num_epochs,i+1,len(train_loader),loss.item()))
+
+    suspicious = []
+    with torch.no_grad():
+        for i,(data, label) in enumerate(test_loader):
+            output = model(data)
+            suspicious.append([output.item(),all_lines[i]])
+    suspicious.sort(reverse=True)
+    return suspicious
+
 def tarantula(all_lines,traces,labels):
     suspicious = []
     total_failed = sum(labels)
@@ -268,7 +353,8 @@ def analysis(cfg,bug_id_list,output_f1,output_f2,std):
         print('false negative rate2 : None')
         output_f2.write('fnr2 : None\n')
 
-    sus_tar1 = tarantula(all_lines,traces,labels1)
+    # sus_tar1 = tarantula(all_lines,traces,labels1)
+    sus_tar1 = BPNN(all_lines,traces,labels1)
     sus_tar2 = tarantula(all_lines,traces,labels2)
     sus_cro1 = crosstab(all_lines,traces,labels1)
     sus_cro2 = crosstab(all_lines,traces,labels2)
@@ -304,7 +390,7 @@ def mainRecord(config,std):
 
 if __name__ == '__main__':
     config = parserConfig()
-    for std in [4,5,6,7,8,9,10]:
+    for std in [4]:
         mainRecord(config,std)
     
         
