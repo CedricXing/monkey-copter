@@ -76,8 +76,17 @@ Monkey-copter is an automatic human-user mimicking program that is created to ru
 cd ArduPilot
 git clone https://github.com/CedricXing/monkey-copter.git
 ```
-Go to the monkey-copter and revise the configuration file `config.ini`. Then try
+Go to the monkey-copter and revise the configuration file `config.ini`. The configuration parameters including
+
+* **root_dir** : the root directory of ArduPilot
+* **real_life** : 'True' for real-life bug subjects and 'False' for artificial bug subjects
+* **mutiple_bugs** : 'True' for mutiple bugs (5 bugs by default) in each subject and 'False' for only one bug in each subject
+* **start** : the starting serial number in one subject
+* **end** : the ending serial number in one subject
+* **rounds** : the number of bug subjects
+
+After finish setting configurations, try
 ```
 nohup python2.7 script.py &
 ```
-to run the monkey program as a background process.
+to run the monkey program as a background process. The simulation results will be exported to `experiment/output/` and the corresponding running configuration files will be exported to `experiment` for the future use in our proposed **Autoregression** labeling method. 
