@@ -92,8 +92,8 @@ class BPNN_Dataset(torch.utils.data.Dataset):
         return len(self.data)
 
 def BPNN(all_lines,traces,labels):
-    num_epochs = 5
-    batch_size = 10
+    num_epochs = 20
+    batch_size = 200
     train_data = BPNN_Dataset(all_lines,traces,labels,transform=transforms.ToTensor(),train=True)
     train_loader = torch.utils.data.DataLoader(dataset=train_data,batch_size=batch_size,shuffle=True)
     test_data = BPNN_Dataset(all_lines,traces,labels,transform=transforms.ToTensor(),train=False)
