@@ -353,11 +353,12 @@ def analysis(cfg,bug_id_list,output_f1,output_f2,std):
         print('false negative rate2 : None')
         output_f2.write('fnr2 : None\n')
 
-    # sus_tar1 = tarantula(all_lines,traces,labels1)
-    sus_tar1 = BPNN(all_lines,traces,labels1)
+    sus_tar1 = tarantula(all_lines,traces,labels1)
     sus_tar2 = tarantula(all_lines,traces,labels2)
     sus_cro1 = crosstab(all_lines,traces,labels1)
     sus_cro2 = crosstab(all_lines,traces,labels2)
+    sus_bp1 = BPNN(all_lines,traces,labels1)
+    sus_bp2 = BPNN(all_lines,traces,labels2)
 
     lines = []
     for bug_id in bug_id_list:
@@ -367,8 +368,8 @@ def analysis(cfg,bug_id_list,output_f1,output_f2,std):
         lines.append(temps)
     print(lines)
     # sus_analysis(lines,[sus_tar1,sus_tar2,sus_cro1,sus_cro2]) 
-    sus_analysis(lines,[sus_tar1,sus_cro1],output_f1)
-    sus_analysis(lines,[sus_tar2,sus_cro2],output_f2)
+    sus_analysis(lines,[sus_tar1,sus_cro1,sus_bp1],output_f1)
+    sus_analysis(lines,[sus_tar2,sus_cro2,sus_bp2],output_f2)
 
 def mainRecord(config,std):
     record_path = config['root_dir'] + 'experiment/'
@@ -390,7 +391,7 @@ def mainRecord(config,std):
 
 if __name__ == '__main__':
     config = parserConfig()
-    for std in [4]:
+    for std in [4,5,6,7,8,9,10]:
         mainRecord(config,std)
     
         
