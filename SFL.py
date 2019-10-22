@@ -6,6 +6,8 @@ import torch.nn as nn
 import torchvision
 import torchvision.transforms as transforms
 import numpy as np
+import sys
+import math
 
 def statics(bug_id_list,group,cfg):
     all_lines = set()
@@ -130,6 +132,24 @@ def BPNN(all_lines,traces,labels):
     suspicious.sort(reverse=True)
     return suspicious
 
+def get_success_cover_information(line,traces,labels):
+    ncs = 0.0
+    ncf = 0.0
+    nus = 0.0
+    nuf = 0.0
+    for trace_id,trace in enumerate(traces):
+        if line in trace:
+            if labels[trace_id] == 0:
+                ncs += 1
+            else:
+                ncf += 1
+        else:
+            if labels[trace_id] == 0:
+                nus += 1
+            else:
+                nuf += 1
+    return ncs,ncf,nus,nuf
+
 def tarantula(all_lines,traces,labels):
     suspicious = []
     total_failed = sum(labels)
@@ -141,23 +161,55 @@ def tarantula(all_lines,traces,labels):
         print('no negative labels')
         return
     for line in all_lines:
-        passed = 0.0
-        failed = 0.0
-        for trace_id,trace in enumerate(traces):
-            if line in trace:
-                if labels[trace_id] == 0: #passed
-                    passed += 1
-                else:
-                    failed += 1
-        if passed + failed == 0:
+        ncs,ncf,nus,nuf = get_success_cover_information(line,traces,labels)
+        nf = ncf + nuf
+        ns = ncs + nus
+        if ncs + ncf == 0:
             suspici = 0
         else:
-            suspici = failed / total_failed / (passed/total_passed+failed/total_failed)
+            suspici = ncf / nf / (ncs/ns+ncf/nf)
         suspicious.append([suspici,line])
     suspicious.sort(reverse=True)
     return suspicious
     #return compressSameValue(suspicious)
     
+def DStar(all_lines,traces,labels):
+    suspicious = []
+    for line in all_lines:
+        ncs,ncf,nus,nuf = get_success_cover_information(line,traces,labels)
+        if nuf + ncs == 0:
+            if ncf != 0:
+                suspicious.append([sys.float_info.max,line])
+            else:
+                suspicious.append([0,line])
+        else:
+            suspicious.append([ncf*ncf/(nuf+ncs),line])
+    suspicious.sort(reverse=True)
+    return suspicious
+
+def Ochiai(all_lines,traces,labels):
+    suspicious = []
+    for line in all_lines:
+        ncs,ncf,nus,nuf = get_success_cover_information(line,traces,labels)
+        nf = ncf + nuf
+        nc = ncf + ncs
+        if nf == 0 or nc == 0:
+            suspicious.append([0,line])
+        else:
+            suspicious.append([ncf/math.sqrt(nf*nc),line])
+    suspicious.sort(reverse=True)
+    return suspicious
+
+def Ochiai2(all_lines,traces,labels):
+    suspicious = []
+    for line in all_lines:
+        ncs,ncf,nus,nuf = get_success_cover_information(line,traces,labels)
+        if ncf + ncs == 0 or nus + nuf == 0 or ncf + nuf == 0 or ncs + nus == 0:
+            suspicious.append([0,line])
+        else:
+            suspicious.append([(ncf*nus/math.sqrt((ncf+ncs)*(nus+nuf)*(ncf+nuf)*(ncs+nus))),line])
+    suspicious.sort(reverse=True)
+    return suspicious
 
 def crosstab(all_lines,traces,labels):
     suspicious = []
@@ -165,21 +217,7 @@ def crosstab(all_lines,traces,labels):
     total_failed = sum(labels)
     total_passed = total_num - total_failed
     for line in all_lines:
-        ncs = 0.0
-        ncf = 0.0
-        nus = 0.0
-        nuf = 0.0
-        for trace_id,trace in enumerate(traces):
-            if line in trace:
-                if labels[trace_id] == 0:
-                    ncs += 1
-                else:
-                    ncf += 1
-            else:
-                if labels[trace_id] == 0:
-                    nus += 1
-                else:
-                    nuf += 1
+        ncs,ncf,nus,nuf = get_success_cover_information(line,traces,labels)
         ns = ncs + nus
         nf = ncf + nuf
         nc = ncs + ncf
@@ -188,10 +226,6 @@ def crosstab(all_lines,traces,labels):
         ecs = (nc * total_passed) / total_num
         euf = (nu * total_failed) / total_num
         eus = (nu * total_passed) / total_num
-        # print(ecf)
-        # print(ecs)
-        # print(euf)
-        # print(eus)
         if ecf == 0:
             t1 = 0
         else:
@@ -353,12 +387,18 @@ def analysis(cfg,bug_id_list,output_f1,output_f2,std):
         print('false negative rate2 : None')
         output_f2.write('fnr2 : None\n')
 
-    sus_tar1 = tarantula(all_lines,traces,labels1)
-    sus_tar2 = tarantula(all_lines,traces,labels2)
-    sus_cro1 = crosstab(all_lines,traces,labels1)
-    sus_cro2 = crosstab(all_lines,traces,labels2)
-    sus_bp1 = BPNN(all_lines,traces,labels1)
-    sus_bp2 = BPNN(all_lines,traces,labels2)
+    # sus_tar1 = tarantula(all_lines,traces,labels1)
+    # sus_tar2 = tarantula(all_lines,traces,labels2)
+    # sus_cro1 = crosstab(all_lines,traces,labels1)
+    # sus_cro2 = crosstab(all_lines,traces,labels2)
+    # sus_bp1 = BPNN(all_lines,traces,labels1)
+    # sus_bp2 = BPNN(all_lines,traces,labels2)
+    sus_tar1 = DStar(all_lines,traces,labels1)
+    sus_tar2 = DStar(all_lines,traces,labels2)
+    sus_cro1 = Ochiai(all_lines,traces,labels1)
+    sus_cro2 = Ochiai(all_lines,traces,labels2)
+    sus_bp1 = Ochiai2(all_lines,traces,labels1)
+    sus_bp2 = Ochiai2(all_lines,traces,labels2)
 
     lines = []
     for bug_id in bug_id_list:
@@ -379,8 +419,6 @@ def mainRecord(config,std):
     output_f2 = open('real_1_' + str(std) + '_1.log2','w')
     for record_file in record_files:
         print(record_file)
-        if '20000' in record_file or '23000' in record_file or '26000' in record_file or '22000' in record_file or '24000' in record_file:
-            continue
         cfg = ConfigParser()
         cfg.read(record_path+record_file)
         temp = cfg.get('param','bug')[1:-1]
