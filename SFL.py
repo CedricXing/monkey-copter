@@ -387,16 +387,16 @@ def analysis(cfg,bug_id_list,output_f1,output_f2,std):
         print('false negative rate2 : None')
         output_f2.write('fnr2 : None\n')
 
-    # sus_tar1 = tarantula(all_lines,traces,labels1)
-    # sus_tar2 = tarantula(all_lines,traces,labels2)
-    # sus_cro1 = crosstab(all_lines,traces,labels1)
-    # sus_cro2 = crosstab(all_lines,traces,labels2)
+    sus_tar1 = tarantula(all_lines,traces,labels1)
+    sus_tar2 = tarantula(all_lines,traces,labels2)
+    sus_cro1 = crosstab(all_lines,traces,labels1)
+    sus_cro2 = crosstab(all_lines,traces,labels2)
     # sus_bp1 = BPNN(all_lines,traces,labels1)
     # sus_bp2 = BPNN(all_lines,traces,labels2)
-    sus_tar1 = DStar(all_lines,traces,labels1)
-    sus_tar2 = DStar(all_lines,traces,labels2)
-    sus_cro1 = Ochiai(all_lines,traces,labels1)
-    sus_cro2 = Ochiai(all_lines,traces,labels2)
+    # sus_tar1 = DStar(all_lines,traces,labels1)
+    # sus_tar2 = DStar(all_lines,traces,labels2)
+    # sus_cro1 = Ochiai(all_lines,traces,labels1)
+    # sus_cro2 = Ochiai(all_lines,traces,labels2)
     sus_bp1 = Ochiai2(all_lines,traces,labels1)
     sus_bp2 = Ochiai2(all_lines,traces,labels2)
 
@@ -410,13 +410,15 @@ def analysis(cfg,bug_id_list,output_f1,output_f2,std):
     # sus_analysis(lines,[sus_tar1,sus_tar2,sus_cro1,sus_cro2]) 
     sus_analysis(lines,[sus_tar1,sus_cro1,sus_bp1],output_f1)
     sus_analysis(lines,[sus_tar2,sus_cro2,sus_bp2],output_f2)
+    output_f1.write(len(all_lines)+'\n')
+    output_f2.write(len(all_lines)+'\n')
 
 def mainRecord(config,std):
     record_path = config['root_dir'] + 'experiment/'
     record_files = [f for f in os.listdir(record_path) if f.startswith('start') ]
     print(record_files)
-    output_f1 = open('real_1_' + str(std) + '_1.log1','w')
-    output_f2 = open('real_1_' + str(std) + '_1.log2','w')
+    output_f1 = open('arti_5_' + str(std) + '_1.log1','w')
+    output_f2 = open('arti_5_' + str(std) + '_1.log2','w')
     for record_file in record_files:
         print(record_file)
         cfg = ConfigParser()
