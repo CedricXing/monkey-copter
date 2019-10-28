@@ -410,8 +410,8 @@ def analysis(cfg,bug_id_list,output_f1,output_f2,std):
     # sus_analysis(lines,[sus_tar1,sus_tar2,sus_cro1,sus_cro2]) 
     sus_analysis(lines,[sus_tar1,sus_cro1,sus_bp1],output_f1)
     sus_analysis(lines,[sus_tar2,sus_cro2,sus_bp2],output_f2)
-    output_f1.write(len(all_lines)+'\n')
-    output_f2.write(len(all_lines)+'\n')
+    output_f1.write(str(len(all_lines))+'\n')
+    output_f2.write(str(len(all_lines))+'\n')
 
 def mainRecord(config,std):
     record_path = config['root_dir'] + 'experiment/'
