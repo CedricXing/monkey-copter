@@ -10,11 +10,7 @@ import sys
 from getopt import getopt, GetoptError
 from pymavlink import mavutil
 
-TOTAL_SIM_TIME = 40
 bug_id = 0
-
-    
-    
     
 def print_info(vehicle):
     print('current altitude:%s'%str(vehicle.location.global_relative_frame.alt))
@@ -49,10 +45,9 @@ class SimRunner:
         self.exp_out_dir = "%s%s/%d/" % (out_dir, 'PA', 0)
         self.ready = True
         self.states = []
+        self.profiles = []
         self.sim_id = "%d_%d" % (sample_id, core_id)
-        self.profile = initial_profile
         copter_file = self.elf_dir + "ArduCopter.elf"
-        # copter_file = elf_dir + "ArduPlane.elf"
         self.delta = 0.1
         self.sitl = SITL(path=copter_file)
         home_str = "%.6f,%.6f,%.2f,%d" % (initial_profile.lat, initial_profile.lon, initial_profile.alt,
@@ -61,8 +56,6 @@ class SimRunner:
                      '+', '--speedup=1', '--defaults='+self.elf_dir+'copter.parm']
         self.sitl.launch(sitl_args, await_ready=True, restart=True, wd=self.elf_dir)
         port_number = 5760 + bug_id * 10
-        self.mission_no = 0
-        # self.missions = [Mission1(),Mission2(),Mission3(),Mission4(),Mission5(),Mission6(),Mission7()]
         self.missions = [Mission1(),Mission2(),Mission3(),Mission4(),Mission5()]
         try:
             self.vehicle = connect('tcp:127.0.0.1:%d' % port_number, wait_ready=True,rate=10)
@@ -80,19 +73,17 @@ class SimRunner:
             time.sleep(1)
         self.arm_vehicle()
         time.sleep(2)
-        self.current_time = 0
-        self.profiles = []
         print(self.vehicle.version)
 
     def run(self):
-        mission = self.missions[self.mission_no]
-        mission.run(self)
+        takeoff_mission = self.missions[0]
+        takeoff_mission.run(self)
         time.sleep(10)
-        self.current_time += 10
         temp_state = []
-        # classify_state = []
         waypoint_num = 3
         T = 2
+
+        ### 4 missions. Each mission has 3 waypoints. For each waypoint, the vehicle runs for 2 seconds 
         for i in range(0,4):
             current_location = self.vehicle.location.global_frame
             if i % 2 == 0:
@@ -102,13 +93,11 @@ class SimRunner:
             for j in range(1,waypoint_num+1):
                 profile = LocationGlobal(current_location.lat+target_delta[0]*j,current_location.lon+target_delta[1]*j,current_location.alt+target_delta[2]*j)
                 self.profiles.append([profile.lat,profile.lon,profile.alt])
-                # self.profiles.append([profile.lat,profile.lon,profile.alt-current_location.alt+20])
                 self.vehicle.simple_goto(profile)
                 current_t = 0
                 temp_state = []
                 while current_t < T:
-                    # print_info(self.vehicle)
-                    # print(current_t)
+                    ### record the [lat,lon,alt,pitch,yaw,roll,velocity] every 0.1 seconds
                     temp_state.append([self.vehicle.location.global_frame.lat,self.vehicle.location.global_frame.lon,self.vehicle.location.global_frame.alt
                     ,self.vehicle.attitude.pitch,self.vehicle.attitude.yaw,self.vehicle.attitude.roll,self.vehicle.velocity[0],self.vehicle.velocity[1],self.vehicle.velocity[2]])
                     time.sleep(0.1)
@@ -133,14 +122,11 @@ class SimRunner:
         print("Simulation %s completed." % self.sim_id)
 
     def run1(self):
-        print('run1')
-        mission = self.missions[self.mission_no]
-        mission.run(self)
+        takeoff_mission = self.missions[0]
+        takeoff_mission.run(self)
         time.sleep(10)
-        self.current_time += 10
         home_location = self.vehicle.location.global_frame
         temp_state = []
-        # classify_state = []
         waypoint_num = 3
         T = 2
         ## first mission : guided mode
@@ -153,12 +139,10 @@ class SimRunner:
             for j in range(1,waypoint_num+1):
                 profile = LocationGlobal(current_location.lat+target_delta[0]*j,current_location.lon+target_delta[1]*j,current_location.alt+target_delta[2]*j)
                 self.profiles.append([profile.lat,profile.lon,profile.alt])
-                # self.profiles.append([profile.lat,profile.lon,profile.alt-current_location.alt+20])
                 self.vehicle.simple_goto(profile)
                 current_t = 0
                 temp_state = []
                 while current_t < T:
-                    # print_info(self.vehicle)
                     temp_state.append([self.vehicle.location.global_frame.lat,self.vehicle.location.global_frame.lon,self.vehicle.location.global_frame.alt
                     ,self.vehicle.attitude.pitch,self.vehicle.attitude.yaw,self.vehicle.attitude.roll,self.vehicle.velocity[0],self.vehicle.velocity[1],self.vehicle.velocity[2]])
                     time.sleep(0.1)
@@ -200,7 +184,6 @@ class SimRunner:
             current_t = 0
             temp_state = []
             while current_t < T:
-                # print_info(self.vehicle)
                 temp_state.append([self.vehicle.location.global_frame.lat,self.vehicle.location.global_frame.lon,self.vehicle.location.global_frame.alt
                 ,self.vehicle.attitude.pitch,self.vehicle.attitude.yaw,self.vehicle.attitude.roll,self.vehicle.velocity[0],self.vehicle.velocity[1],self.vehicle.velocity[2]])
                 time.sleep(0.1)
@@ -215,7 +198,6 @@ class SimRunner:
             current_t = 0
             temp_state = []
             while current_t < T:
-                # print_info(self.vehicle)
                 temp_state.append([self.vehicle.location.global_frame.lat,self.vehicle.location.global_frame.lon,self.vehicle.location.global_frame.alt
                 ,self.vehicle.attitude.pitch,self.vehicle.attitude.yaw,self.vehicle.attitude.roll,self.vehicle.velocity[0],self.vehicle.velocity[1],self.vehicle.velocity[2]])
                 time.sleep(0.1)
@@ -243,31 +225,24 @@ def run_sim(config,mission_no):
     sim_start = config['start']
     sim_end = config['end']
     
-    sample_cnt = sim_start
-    mission_loader_id = 1
-    labeling_method = 'PA'
-    
-    while sample_cnt < sim_end:
-        print("simulation round %d-----------------------------------------\n" %sample_cnt)
+    ### start simulations, (sim_end - sim_start) rounds for all
+    while sim_start < sim_end:
+        print("simulation round %d-----------------------------------------\n" %sim_start)
         try:
-            if labeling_method == 'PA':
-                profiles_generated = generate_profiles(cluster=False)
-            else:
-                profiles_generated = generate_profiles(cluster=False)
-            p = profiles_generated[0]
+            ### generate only one profile as the home location in default
+            profiles_generated = generate_profiles()
             for core_cnt, profile in enumerate(profiles_generated):
-                state_data = []
-                sim = SimRunner(sample_cnt, core_cnt, profile,config)
+                sim = SimRunner(sim_start, core_cnt, profile,config)
                 if sim.ready:
-                    if mission_no == 0:
+                    if mission_no == 0: ### run four basic guided missions
                         sim.run()
-                    else:
+                    else: ### this is designed for bug subjects that contain bugs in rtl, auto, arco...
                         sim.run1()
                 else:
                     print("Not ready for mission")
                     break
             else:
-                sample_cnt += 1
+                sim_start += 1
         except IOError:
             print('io error')
             continue

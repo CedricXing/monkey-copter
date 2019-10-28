@@ -60,8 +60,8 @@ class InitialProfile:
             self.params = copy.deepcopy(reference.params)
 
 
-def generate_profiles(reference=None, cluster=True,AR_SI_based=True):
-    if AR_SI_based:
+def generate_profiles(reference=None, cluster=True,one_profile=True):
+    if one_profile:
         return [InitialProfile()]
     if cluster:
         if reference is None:
