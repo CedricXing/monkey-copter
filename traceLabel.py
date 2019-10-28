@@ -193,8 +193,6 @@ def LinearRegressionBasedLabel(state,profile,std=6):
         phi_i_inv = phi_i_inv / lambd - math.pow(lambd,-2)*np.mat(phi_i_inv)*np.mat(Yk)*inv(np.mat(np.identity(1)+np.mat(YkT)*np.mat(phi_i_inv)*np.mat(Yk)/lambd))*np.mat(YkT)*np.mat(phi_i_inv)
         A_i = np.mat(psi_i)*np.mat(phi_i_inv)
         i += 1
-    print('---------------')
-    print(errors)
     return True
 
 if __name__ == '__main__':
