@@ -68,7 +68,10 @@ class SimRunner:
             self.ready = False
             return
         for k, v in initial_profile.params.items():
-            self.vehicle.parameters[k] = v
+            print(k + ':' + str(self.vehicle.parameters[k]))
+            # self.vehicle.parameters[k] = v
+        # for k, v in self.vehicle.parameters.items():
+            # print(k)
         while not self.vehicle.is_armable:
             print('initializing...')
             time.sleep(1)
@@ -82,33 +85,24 @@ class SimRunner:
         time.sleep(10)
         temp_state = []
         waypoint_num = 3
-        T = 2
+        current_location = self.vehicle.location.global_frame
+        target1 = LocationGlobal(current_location.lat + 0.1,current_location.lon+0.1,current_location.alt)
+        target2 = LocationGlobal(current_location.lat - 0.1,current_location.lon-0.1,current_location.alt)
 
-        ### 4 missions. Each mission has 3 waypoints. For each waypoint, the vehicle runs for 2 seconds 
-        for i in range(0,4):
-            current_location = self.vehicle.location.global_frame
-            if i % 2 == 0:
-                target_delta = [random.uniform(0.0002,0.0003)/waypoint_num,random.uniform(0.0002,0.0003)/waypoint_num,random.uniform(20,30)/waypoint_num]
-            else:
-                target_delta = [random.uniform(0.0002,0.0003)/waypoint_num,random.uniform(-0.0003,-0.0002)/waypoint_num,random.uniform(-30,-20)/waypoint_num]
-            # count = 0
-            for j in range(1,waypoint_num+1):
-                profile = LocationGlobal(current_location.lat+target_delta[0]*j,current_location.lon+target_delta[1]*j,current_location.alt+target_delta[2]*j)
-                self.profiles.append([profile.lat,profile.lon,profile.alt])
-                self.vehicle.simple_goto(profile)
-                current_t = 0
-                temp_state = []
-                
-                while current_t < T:
-                    ### record the [lat,lon,alt,pitch,yaw,roll,velocity] every 0.1 seconds
-                    temp_state.append([self.vehicle.location.global_frame.lat,self.vehicle.location.global_frame.lon,self.vehicle.location.global_frame.alt
-                    ,self.vehicle.attitude.pitch,self.vehicle.attitude.yaw,self.vehicle.attitude.roll,self.vehicle.velocity[0],self.vehicle.velocity[1],self.vehicle.velocity[2]])
-                    time.sleep(0.1)
-                    current_t += 0.1
-                    # count += 1
-                    # print(count)
-                    # print_info(self.vehicle)
-                self.states.append(temp_state)
+        current_t = 0
+        self.vehicle.simple_goto(target1)
+        while current_t < 50:
+            self.states.append([self.vehicle.velocity[0],self.vehicle.velocity[1],self.vehicle.velocity[2]])
+            time.sleep(0.1)
+            current_t += 0.1
+            print_info(self.vehicle)
+
+        self.vehicle.simple_goto(target2)
+        while current_t < 100:
+            self.states.append([self.vehicle.velocity[0],self.vehicle.velocity[1],self.vehicle.velocity[2]])
+            time.sleep(0.1)
+            current_t += 0.1
+            print_info(self.vehicle)
 
         self.vehicle.close()
         self.sitl.stop()
@@ -153,6 +147,7 @@ class SimRunner:
                     ,self.vehicle.attitude.pitch,self.vehicle.attitude.yaw,self.vehicle.attitude.roll,self.vehicle.velocity[0],self.vehicle.velocity[1],self.vehicle.velocity[2]])
                     time.sleep(0.1)
                     current_t += 0.1
+                    print_info(self.vehicle)
                 self.states.append(temp_state)
         
         ## second mission : acro mode
@@ -172,7 +167,7 @@ class SimRunner:
                     ,self.vehicle.attitude.pitch,self.vehicle.attitude.yaw,self.vehicle.attitude.roll,self.vehicle.velocity[0],self.vehicle.velocity[1],self.vehicle.velocity[2]])
                 time.sleep(0.1)
                 current_t += 0.1
-                # print_info(self.vehicle)
+                print_info(self.vehicle)
             self.states.append(temp_state)
         
         ## third mission : auto mode
@@ -194,6 +189,7 @@ class SimRunner:
                 ,self.vehicle.attitude.pitch,self.vehicle.attitude.yaw,self.vehicle.attitude.roll,self.vehicle.velocity[0],self.vehicle.velocity[1],self.vehicle.velocity[2]])
                 time.sleep(0.1)
                 current_t += 0.1
+                print_info(self.vehicle)
             self.vehicle.commands.next += 1
             self.states.append(temp_state)
 
@@ -208,6 +204,7 @@ class SimRunner:
                 ,self.vehicle.attitude.pitch,self.vehicle.attitude.yaw,self.vehicle.attitude.roll,self.vehicle.velocity[0],self.vehicle.velocity[1],self.vehicle.velocity[2]])
                 time.sleep(0.1)
                 current_t += 0.1
+                print_info(self.vehicle)
             self.states.append(temp_state)
         self.vehicle.close()
         self.sitl.stop()

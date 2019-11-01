@@ -18,9 +18,15 @@ class InitialProfile:
             self.lat = random.uniform(-36, -35)
             self.lon = random.uniform(40, 41)
             self.alt = random.uniform(400.0, 500.0)
+            # self.lat = -35
+            # self.lon = 40
+            # self.alt = 400
             self.roll = random.uniform(-20, 20)
             self.pitch = random.uniform(-20, 20)
             self.yaw = random.uniform(10.0, 350.0)
+            # self.roll = 0
+            # self.pitch = 0
+            # self.yaw = 0
             self.home = LocationGlobal(self.lat,self.lon,self.alt)
             self.target1 = LocationGlobal(random.uniform(self.lat+0.002, self.lat+0.003),
                                           random.uniform(self.lon+0.002, self.lon+0.003),
@@ -37,12 +43,18 @@ class InitialProfile:
             # self.targets = [target1,target2,target3,target4]
             self.gs1 = random.randint(2, 10)
             self.gs2 = random.randint(10, 15)
-            self.params = {"WPNAV_SPEED": random.randrange(200, 900, 50),
-                           "WPNAV_RADIUS": random.randrange(110, 490, 1),
-                           "WPNAV_SPEED_UP": random.randrange(100, 500, 50),
-                           "WPNAV_SPEED_DN": random.randrange(60, 250, 10),
-                           "WPNAV_ACCEL": random.randrange(100, 250, 10),
-                           "WPNAV_ACCEL_Z": random.randrange(100, 250, 10)}
+            # self.params = {"WPNAV_SPEED": random.randrange(200, 900, 50),
+            #                "WPNAV_RADIUS": random.randrange(110, 490, 1),
+            #                "WPNAV_SPEED_UP": random.randrange(100, 500, 50),
+            #                "WPNAV_SPEED_DN": random.randrange(60, 250, 10),
+            #                "WPNAV_ACCEL": random.randrange(100, 250, 10),
+            #                "WPNAV_ACCEL_Z": random.randrange(100, 250, 10)}
+            self.params = {"WPNAV_SPEED": 2000,
+                           "WPNAV_RADIUS": 200,
+                           "WPNAV_SPEED_UP": 2000,
+                           "WPNAV_SPEED_DN": 2000,
+                           "WPNAV_ACCEL": 1000,
+                           "WPNAV_ACCEL_Z": 100}
 
         else:
             self.lat = random.uniform(reference.lat-0.0001, reference.lat+0.0001)
