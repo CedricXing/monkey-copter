@@ -71,18 +71,20 @@ sudo pip install dronekit-sitl -UI
 **Note**: dronekit only supports Python2.7.
 
 ### Set up monkey-copter
-Monkey-copter is an automatic human-user mimicking program that is created to run the simulations automatically. You can download it by git using the following command
+#### Clone monkey-copter repository
+Monkey-copter is an automatic human-user mimicking program that is created to run the simulations automatically. It can be downloaded by git using the following command
 ```
 cd ArduPilot
 git clone https://github.com/CedricXing/monkey-copter.git
 ```
-Go to the monkey-copter and revise the configuration file `config.ini`. The configuration parameters including
+#### Run the simulations
+We prepare the script and configuration file to run the simulations automatically. Firstly, go to the monkey-copter and revise the configuration file `config.ini`. The configuration parameters including
 
 * **root_dir** : the root directory of ArduPilot
 * **real_life** : 'True' for real-life bug subjects and 'False' for artificial bug subjects
 * **mutiple_bugs** : 'True' for mutiple bugs (5 bugs by default) in each subject and 'False' for only one bug in each subject
-* **start** : the starting serial number in one subject
-* **end** : the ending serial number in one subject
+* **start** : the starting serial number of one subject
+* **end** : the ending serial number of one subject
 * **rounds** : the number of bug subjects
 
 After finish setting configurations, try
@@ -90,3 +92,10 @@ After finish setting configurations, try
 nohup python2.7 script.py &
 ```
 to run the monkey program as a background process. The simulation results will be exported to `experiment/output/` and the corresponding running configuration files will be exported to `experiment` for the future use in our proposed **Autoregression** labeling method. 
+
+#### Run the Software Fault Localization(SFL) tools
+We have implemented 6 SFL tools including `Tarantula`, `Crosstab`, `BPNN`, `DStar`, `Ochiai`, `Ochiai2`. Specifically, `BPNN` is based on neural network and we implement it by [Pytorch](https://pytorch.org/) framework. So we need to install `pytorch` first. We recommend [Anaconda](https://www.anaconda.com/) to install the relative python packages. Go to the [Anaconda-download page](https://www.anaconda.com/distribution/) to download the `Anaconda` installation package and install it. After that, try
+```
+conda install pytorch torchvision cpuonly -c pytorch
+```
+to install the cpuonly-version `pytorch`.
