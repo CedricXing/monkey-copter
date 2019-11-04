@@ -78,7 +78,7 @@ cd ArduPilot
 git clone https://github.com/CedricXing/monkey-copter.git
 ```
 #### Run the simulations
-We prepare the script and configuration file to run the simulations automatically. Firstly, go to the monkey-copter and revise the configuration file `config.ini`. The configuration parameters including
+We prepare the script and configuration file to run the simulations automatically. Firstly, enter the monkey-copter and revise the configuration file `config.ini`. The configuration parameters including
 
 * **root_dir** : the root directory of ArduPilot
 * **real_life** : 'True' for real-life bug subjects and 'False' for artificial bug subjects
@@ -94,7 +94,7 @@ nohup python2.7 script.py &
 to run the monkey program as a background process. The simulation results will be exported to `experiment/output/` and the corresponding running configuration files will be exported to `experiment` for the future use in our proposed **Autoregression** labeling method. 
 
 #### Run the Software Fault Localization(SFL) tools
-We have implemented 6 SFL tools including `Tarantula`, `Crosstab`, `BPNN`, `DStar`, `Ochiai`, `Ochiai2`. Specifically, `BPNN` is based on neural network and we implement it by [Pytorch](https://pytorch.org/) framework. So we need to install `pytorch` first. We recommend [Anaconda](https://www.anaconda.com/) to install the relative python packages. Go to the [Anaconda-download page](https://www.anaconda.com/distribution/) to download the `Anaconda` installation package and install it. After that, try
+We have implemented 6 SFL tools including `Tarantula`, `Crosstab`, `BPNN`, `DStar`, `Ochiai`, `Ochiai2`. Specifically, `BPNN` is based on neural network and we implement it by [Pytorch](https://pytorch.org/) framework. So we need to install `pytorch` first. We recommend [Anaconda](https://www.anaconda.com/) to install the relative python packages. Go to the [Anaconda-download page](https://www.anaconda.com/distribution/) to download the `Anaconda` installation package and then install it. After that, try
 ```
 conda install pytorch torchvision cpuonly -c pytorch
 ```
