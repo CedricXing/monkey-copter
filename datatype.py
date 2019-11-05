@@ -49,12 +49,12 @@ class InitialProfile:
             #                "WPNAV_SPEED_DN": random.randrange(60, 250, 10),
             #                "WPNAV_ACCEL": random.randrange(100, 250, 10),
             #                "WPNAV_ACCEL_Z": random.randrange(100, 250, 10)}
-            self.params = {"WPNAV_SPEED": 2000,
+            self.params = {"WPNAV_SPEED": 200,
                            "WPNAV_RADIUS": 200,
-                           "WPNAV_SPEED_UP": 2000,
-                           "WPNAV_SPEED_DN": 2000,
-                           "WPNAV_ACCEL": 1000,
-                           "WPNAV_ACCEL_Z": 100}
+                           "WPNAV_SPEED_UP": 200,
+                           "WPNAV_SPEED_DN": 200,
+                           "WPNAV_ACCEL": 250,
+                           "WPNAV_ACCEL_Z": 250}
 
         else:
             self.lat = random.uniform(reference.lat-0.0001, reference.lat+0.0001)

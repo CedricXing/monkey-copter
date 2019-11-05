@@ -68,8 +68,8 @@ class SimRunner:
             self.ready = False
             return
         for k, v in initial_profile.params.items():
-            print(k + ':' + str(self.vehicle.parameters[k]))
-            # self.vehicle.parameters[k] = v
+            # print(k + ':' + str(self.vehicle.parameters[k]))
+            self.vehicle.parameters[k] = v
         # for k, v in self.vehicle.parameters.items():
             # print(k)
         while not self.vehicle.is_armable:
@@ -86,12 +86,12 @@ class SimRunner:
         temp_state = []
         waypoint_num = 3
         current_location = self.vehicle.location.global_frame
-        target1 = LocationGlobal(current_location.lat + 0.1,current_location.lon+0.1,current_location.alt)
-        target2 = LocationGlobal(current_location.lat - 0.1,current_location.lon-0.1,current_location.alt)
+        target1 = LocationGlobal(current_location.lat + 0.1,current_location.lon,current_location.alt)
+        target2 = LocationGlobal(current_location.lat - 0.1,current_location.lon,current_location.alt)
 
         current_t = 0
         self.vehicle.simple_goto(target1)
-        while current_t < 50:
+        while current_t < 20:
             self.states.append([self.vehicle.velocity[0],self.vehicle.velocity[1],self.vehicle.velocity[2]])
             time.sleep(0.1)
             current_t += 0.1

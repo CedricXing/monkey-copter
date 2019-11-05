@@ -136,7 +136,7 @@ class SimRunner:
         waypoint_num = 3
         T = 2
         ## first mission : guided mode
-        for i in range(0,4):
+        for i in range(0,1):
             current_location = self.vehicle.location.global_frame
             if i % 2 == 0:
                 target_delta = [random.uniform(0.0002,0.0003)/waypoint_num,random.uniform(0.0002,0.0003)/waypoint_num,random.uniform(20,30)/waypoint_num]

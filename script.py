@@ -33,13 +33,17 @@ def recoverAllFiles():
         
 def run(config):
     if config['real_life'] == 'True':
-        group = real_life_bug_group
+        group = [3,4,5,6]
+        # group = real_life_bug_group
     else:
-        group = bug_group
+        group = [0,1,3,6,10,11,12,14]
+        # group = bug_group
     if config['mutiple_bugs'] == 'True':
-        bug_id_list = random.sample(list(range(0,len(group))),5)
+        bug_id_list = random.sample(group,5)
+        # bug_id_list = random.sample(list(range(0,len(group))),5)
     else:
-        bug_id_list = random.sample(list(range(0,len(group))),1)
+        bug_id_list = random.sample(group,1)
+        # bug_id_list = random.sample(list(range(0,len(group))),1)
     print(bug_id_list)
     start = config['start']
     end = config['end']
@@ -48,7 +52,7 @@ def run(config):
 #     for i in bug_id_list:
 #         os.system('cp /home/cedric/Desktop/copterTest/0/' + group[i]['file'] + ' /home/cedric/Desktop/arduPilot/' + group[i]['file'])
     os.chdir(config['root_dir'])
-    cfg_name = 'start_'+str(start)+'.ini'
+    cfg_name = 'xing_start_'+str(start)+'.ini'
     os.system('cp monkey-copter/config.ini experiment/'+cfg_name)
     writeConfig(cfg_name,bug_id_list,start,end)
     os.system('make sitl -j4')
