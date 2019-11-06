@@ -320,6 +320,7 @@ real_life_target_bugs = [
     '_rate_target_ang_vel.y += -constrain_float(attitude_error_vector.x, -M_PI / 4, M_PI / 4) * _ahrs.get_gyro().z;', # 6
     'return MAX(ToDeg(_althold_lean_angle_max), AC_ATTITUDE_CONTROL_ANGLE_LIMIT_MIN) * 100.0f;', # 7
     'if ((vector_length > max_length) && is_positive(vector_length))', # 8
+    '/*target*/_vel_desired.z = 0.0f;', # 9
 ]
 
 real_life_mutated_bugs = [
@@ -332,6 +333,7 @@ real_life_mutated_bugs = [
     '/*!! BUG !! */ _rate_target_ang_vel.y += -attitude_error_vector.x * _ahrs.get_gyro().z;', # 6
     '/*!! BUG !! */ return ToDeg(_althold_lean_angle_max) * 100.0f;', # 7
     '/*!! BUG !! */ if ((vector_length > max_length) && is_positive(max_length))', # 8
+    '/*!! BUG !! */ ///*target*/_vel_desired.z = 0.0f;', # 9
 ]
 
 real_life_bug_group = [
@@ -375,6 +377,12 @@ real_life_bug_group = [
         'start':11000000,
         'lineno':[1167]
     }, # 6
+    {
+        'file':'libraries/AC_AttitudeControl/AC_PosControl.cpp',
+        'indices':[9],
+        'start':11000000,
+        'lineno':[287]
+    }, # 7
 ]
 # # Single Bug
 # for i, bug in enumerate(bug_group):

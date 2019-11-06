@@ -33,8 +33,10 @@ def recoverAllFiles():
         
 def run(config):
     if config['real_life'] == 'True':
-        group = [3,4,5,6]
-        # group = real_life_bug_group
+        if config['mutiple_bugs'] == 'True':
+            group = real_life_bug_group
+        else:
+            group = [3,4,5,6,7]
     else:
         group = [0,1,3,6,10,11,12,14]
         # group = bug_group
@@ -63,8 +65,6 @@ def run(config):
         run_sim(config,1)
     else:
         run_sim(config,0)
-
-
 
 if __name__ == '__main__':
     config = parserConfig()

@@ -32,7 +32,7 @@ def labelTraces_LR(states=None,profiles=None,std=6):
         profile = profiles[simulate_id]
         label = True
         for mission_id in range(0,len(profile)):
-            if mission_id > 0 and mission_id % 3 == 0:
+            if mission_id % 3 == 0:
                 continue
             state_temp = state[mission_id] # all the states for one mission
             profile_temp = profile[mission_id][:AR_dimension] # here we only focus on lat, lon, alt

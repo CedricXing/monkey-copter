@@ -82,10 +82,10 @@ class SimRunner:
         time.sleep(10)
         temp_state = []
         waypoint_num = 3
-        T = 2
+        T = 4
 
         ### 4 missions. Each mission has 3 waypoints. For each waypoint, the vehicle runs for 2 seconds 
-        for i in range(0,4):
+        for i in range(0,8):
             current_location = self.vehicle.location.global_frame
             if i % 2 == 0:
                 target_delta = [random.uniform(0.0002,0.0003)/waypoint_num,random.uniform(0.0002,0.0003)/waypoint_num,random.uniform(20,30)/waypoint_num]
@@ -134,9 +134,9 @@ class SimRunner:
         home_location = self.vehicle.location.global_frame
         temp_state = []
         waypoint_num = 3
-        T = 2
+        T = 4
         ## first mission : guided mode
-        for i in range(0,1):
+        for i in range(0,5):
             current_location = self.vehicle.location.global_frame
             if i % 2 == 0:
                 target_delta = [random.uniform(0.0002,0.0003)/waypoint_num,random.uniform(0.0002,0.0003)/waypoint_num,random.uniform(20,30)/waypoint_num]

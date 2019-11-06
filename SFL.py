@@ -415,7 +415,7 @@ def analysis(cfg,bug_id_list,output_f1,output_f2,std):
 
 def mainRecord(config,std):
     record_path = config['root_dir'] + 'experiment/'
-    record_files = [f for f in os.listdir(record_path) if f.startswith('start') ]
+    record_files = [f for f in os.listdir(record_path) if f.startswith('xing_start') ]
     print(record_files)
     output_f1 = open('arti_5_' + str(std) + '_1.log1','w')
     output_f2 = open('arti_5_' + str(std) + '_1.log2','w')
@@ -431,7 +431,7 @@ def mainRecord(config,std):
 
 if __name__ == '__main__':
     config = parserConfig()
-    for std in [4,5,6,7,8,9,10]:
+    for std in np.arange(4,10.5,0.5):
         mainRecord(config,std)
     
         
