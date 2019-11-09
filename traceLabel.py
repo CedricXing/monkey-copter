@@ -35,6 +35,10 @@ def labelTraces_LR(states=None,profiles=None,std=6):
             if mission_id % 3 == 0:
                 continue
             state_temp = state[mission_id] # all the states for one mission
+            if len(state_temp) > 60:
+                state_temp = state_temp[:80:4]
+            elif len(state_temp) > 20:
+                state_temp = state_temp[:40:2]
             profile_temp = profile[mission_id][:AR_dimension] # here we only focus on lat, lon, alt
             if not LinearRegressionBasedLabel(state_temp,profile_temp,std=std):
                 label = False
@@ -58,6 +62,10 @@ def labelTraces_LR1(states=None,profiles=None,std=6):
         label = True
         for mission_id in range(0,len(profile)):
             state_temp = state[mission_id]
+            if len(state_temp) > 60:
+                state_temp = state_temp[:80:4]
+            elif len(state_temp) > 20:
+                state_temp = state_temp[:40:2]
             profile_temp = profile[mission_id][:AR_dimension]
             if not LinearRegressionBasedLabel(state_temp,profile_temp,std=std):
                 label = False

@@ -54,7 +54,7 @@ def run(config):
 #     for i in bug_id_list:
 #         os.system('cp /home/cedric/Desktop/copterTest/0/' + group[i]['file'] + ' /home/cedric/Desktop/arduPilot/' + group[i]['file'])
     os.chdir(config['root_dir'])
-    cfg_name = 'xing_start_'+str(start)+'.ini'
+    cfg_name = 'new_start_'+str(start)+'.ini'
     os.system('cp monkey-copter/config.ini experiment/'+cfg_name)
     writeConfig(cfg_name,bug_id_list,start,end)
     os.system('make sitl -j4')

@@ -43,18 +43,18 @@ class InitialProfile:
             # self.targets = [target1,target2,target3,target4]
             self.gs1 = random.randint(2, 10)
             self.gs2 = random.randint(10, 15)
-            # self.params = {"WPNAV_SPEED": random.randrange(200, 900, 50),
-            #                "WPNAV_RADIUS": random.randrange(110, 490, 1),
-            #                "WPNAV_SPEED_UP": random.randrange(100, 500, 50),
-            #                "WPNAV_SPEED_DN": random.randrange(60, 250, 10),
-            #                "WPNAV_ACCEL": random.randrange(100, 250, 10),
-            #                "WPNAV_ACCEL_Z": random.randrange(100, 250, 10)}
-            self.params = {"WPNAV_SPEED": 500,
-                           "WPNAV_RADIUS": 500,
-                           "WPNAV_SPEED_UP": 200,
-                           "WPNAV_SPEED_DN": 200,
-                           "WPNAV_ACCEL": 300,
-                           "WPNAV_ACCEL_Z": 300}
+            self.params = {"WPNAV_SPEED": random.randrange(200, 900, 50),
+                           "WPNAV_RADIUS": random.randrange(110, 490, 1),
+                           "WPNAV_SPEED_UP": random.randrange(100, 500, 50),
+                           "WPNAV_SPEED_DN": random.randrange(60, 250, 10),
+                           "WPNAV_ACCEL": random.randrange(100, 250, 10),
+                           "WPNAV_ACCEL_Z": random.randrange(100, 250, 10)}
+            # self.params = {"WPNAV_SPEED": 500,
+            #                "WPNAV_RADIUS": 500,
+            #                "WPNAV_SPEED_UP": 200,
+            #                "WPNAV_SPEED_DN": 200,
+            #                "WPNAV_ACCEL": 300,
+            #                "WPNAV_ACCEL_Z": 300}
 
         else:
             self.lat = random.uniform(reference.lat-0.0001, reference.lat+0.0001)

@@ -295,6 +295,7 @@ def sus_analysis(lines,sus_list,output_f):
             if min_rank != 10000:
                 result.append(min_rank)
         output_f.write(str(result)+'\n')
+        print(str(result)+'\n')
         print('~~~~~~~~~~~')
 
 def parserConfig():
@@ -315,6 +316,7 @@ def analysis(cfg,bug_id_list,output_f1,output_f2,std):
     else:
         group = bug_group
     # bug_id_list = [0,1,7,11,15]
+    print(bug_id_list)
     all_lines = statics(bug_id_list,group,cfg)
     # print(all_lines)
     start = int(cfg.get('param','start'))
@@ -415,7 +417,7 @@ def analysis(cfg,bug_id_list,output_f1,output_f2,std):
 
 def mainRecord(config,std):
     record_path = config['root_dir'] + 'experiment/'
-    record_files = [f for f in os.listdir(record_path) if f.startswith('xing_start') ]
+    record_files = [f for f in os.listdir(record_path) if f.startswith('start') ]
     print(record_files)
     output_f1 = open('arti_5_' + str(std) + '_1.log1','w')
     output_f2 = open('arti_5_' + str(std) + '_1.log2','w')
@@ -431,7 +433,7 @@ def mainRecord(config,std):
 
 if __name__ == '__main__':
     config = parserConfig()
-    for std in np.arange(4,10.5,0.5):
+    for std in np.arange(4,10.5,1):
         mainRecord(config,std)
     
         
