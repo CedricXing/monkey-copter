@@ -21,11 +21,10 @@ def statics(bug_id_list,group,cfg):
 def executionTracesClean(bug_id_list,group,start,end,cfg):
     output_dir = cfg.get('param','root_dir')+'experiment/output/PA/0/'
     traces = []
-    for simulate_id in range(start,end+1):
-        # trace_set = set()
+    for simulate_id in range(start,end):
         current_trace = []
         with open(output_dir+'raw_%s_0.txt'%simulate_id) as f:
-            for line in f:
+            for line in f: ### each line no appears only once
                 for bug_id in bug_id_list:
                     if group[bug_id]['file'] in line:
                         temp_str = line.split('-')[2].strip()
@@ -33,11 +32,8 @@ def executionTracesClean(bug_id_list,group,start,end,cfg):
                             # todo : take advantage of the sum times
                             continue
                         new_line = group[bug_id]['file']+'-'+str(temp_str)
-                        # if new_line not in trace_set:
                         current_trace.append(new_line)
-                            # trace_set.add(new_line)
                         break
-                    # current_pos_trace.append(int(temp_str[:temp_str.find(':')]))
         current_trace.sort()
         if len(current_trace) == 0:
             print('log execution traces fail for simulate_id %d'%simulate_id)
@@ -121,7 +117,7 @@ def BPNN(all_lines,traces,labels):
             loss.backward()
             optimizer.step()
 
-            if (i+1) % 1 == 0:
+            if (i+1) % 5 == 0:
                 print('Epoch [{}/{}], Step[{}/{}], Loss: {:.4f}'.format(epoch+1,num_epochs,i+1,len(train_loader),loss.item()))
 
     suspicious = []
@@ -315,22 +311,15 @@ def analysis(cfg,bug_id_list,output_f1,output_f2,std):
         group = real_life_bug_group
     else:
         group = bug_group
-    # bug_id_list = [0,1,7,11,15]
     print(bug_id_list)
     all_lines = statics(bug_id_list,group,cfg)
-    # print(all_lines)
     start = int(cfg.get('param','start'))
-    ##### test std : end = start + 200
     end = int(cfg.get('param','end'))
-    # end = start + 200
-    traces = executionTracesClean(bug_id_list,group,start,end-1,cfg)
-    # print(all_lines)
+    traces = executionTracesClean(bug_id_list,group,start,end,cfg)
     print(len(traces))
     for bug_id in bug_id_list:
         print(str(bug_id) + ':' + group[bug_id]['file'])
     states,profiles = simulationResultClean(cfg,start,end-1)
-    # labels,positives = test_labelTraces(states,profiles)
-    # return
     labels1,positive1 = labelTraces_LR(states,profiles,std)
     labels2,positive2 = labelTraces_LR1(states,profiles,std)
     positive_id = set()
@@ -364,10 +353,6 @@ def analysis(cfg,bug_id_list,output_f1,output_f2,std):
         if i not in positive2 and i in positive_id:
             false_negative2 += 1
 
-    # print('false1_positive : %d / %d'%(false_positive1,len(negative_id)))
-    # print('false2_positive : %d / %d'%(false_positive2,len(negative_id)))
-    # print('false1_negative : %d / %d'%(false_negative1,len(positive_id)))
-    # print('false2_negative : %d / %d'%(false_negative2,len(positive_id)))
     if len(negative_id) != 0:
         print('false positive rate1 : %f'%(float(false_positive1)/len(negative_id)))
         output_f1.write('fpr1 : %f\n'%(float(false_positive1)/len(negative_id)))
@@ -409,7 +394,6 @@ def analysis(cfg,bug_id_list,output_f1,output_f2,std):
             temps.append(group[bug_id]['file']+'-'+str(line_no))
         lines.append(temps)
     print(lines)
-    # sus_analysis(lines,[sus_tar1,sus_tar2,sus_cro1,sus_cro2]) 
     sus_analysis(lines,[sus_tar1,sus_cro1,sus_bp1],output_f1)
     sus_analysis(lines,[sus_tar2,sus_cro2,sus_bp2],output_f2)
     output_f1.write(str(len(all_lines))+'\n')
