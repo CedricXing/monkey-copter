@@ -1,10 +1,10 @@
 from traceLabel import *
 from injector import *
 from configparser import ConfigParser
-import torch
-import torch.nn as nn
-import torchvision
-import torchvision.transforms as transforms
+# import torch
+# import torch.nn as nn
+# import torchvision
+# import torchvision.transforms as transforms
 import numpy as np
 import sys
 import math
@@ -49,84 +49,84 @@ def compressSameValue(suspicious):
             sus[-1][1].append(element[1])
     return sus
 
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-learning_rate = 0.00000001
+# device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+# learning_rate = 0.00000001
 
-class NeuralNet(nn.Module):
-    def __init__(self,input_size,hidden_size,num_classes):
-        super(NeuralNet,self).__init__()
-        self.fc1 = nn.Linear(input_size,hidden_size)
-        self.sigmoid = nn.Sigmoid()
-        self.fc2 = nn.Linear(hidden_size,num_classes)
+# class NeuralNet(nn.Module):
+#     def __init__(self,input_size,hidden_size,num_classes):
+#         super(NeuralNet,self).__init__()
+#         self.fc1 = nn.Linear(input_size,hidden_size)
+#         self.sigmoid = nn.Sigmoid()
+#         self.fc2 = nn.Linear(hidden_size,num_classes)
     
-    def forward(self, x):
-        out = self.fc1(x)
-        out = self.sigmoid(out)
-        out = self.fc2(out)
-        return out
+#     def forward(self, x):
+#         out = self.fc1(x)
+#         out = self.sigmoid(out)
+#         out = self.fc2(out)
+#         return out
 
-class BPNN_Dataset(torch.utils.data.Dataset):
-    def __init__(self,all_lines,traces,labels,transform,train):
-        if train:
-            self.data = torch.zeros((len(traces),len(all_lines)))
-            for i,trace in enumerate(traces):
-                for j,line in enumerate(all_lines):
-                    if line in trace:
-                        self.data[i][j] = 1.0
-            self.labels = torch.zeros((len(labels),1),dtype=torch.float)
-            for i,label in enumerate(labels):
-                if labels[i] == 1:
-                    self.labels[i][0] = 1.0
-        else:
-            self.data = torch.eye(len(all_lines))
-            self.labels = torch.zeros((len(all_lines),1))
-        self.transform = transform
+# class BPNN_Dataset(torch.utils.data.Dataset):
+#     def __init__(self,all_lines,traces,labels,transform,train):
+#         if train:
+#             self.data = torch.zeros((len(traces),len(all_lines)))
+#             for i,trace in enumerate(traces):
+#                 for j,line in enumerate(all_lines):
+#                     if line in trace:
+#                         self.data[i][j] = 1.0
+#             self.labels = torch.zeros((len(labels),1),dtype=torch.float)
+#             for i,label in enumerate(labels):
+#                 if labels[i] == 1:
+#                     self.labels[i][0] = 1.0
+#         else:
+#             self.data = torch.eye(len(all_lines))
+#             self.labels = torch.zeros((len(all_lines),1))
+#         self.transform = transform
     
-    def __getitem__(self,index):
-        # print(self.data[index])
-        return self.data[index], self.labels[index]
+#     def __getitem__(self,index):
+#         # print(self.data[index])
+#         return self.data[index], self.labels[index]
 
-    def __len__(self):
-        return len(self.data)
+#     def __len__(self):
+#         return len(self.data)
 
-def BPNN(all_lines,traces,labels):
-    num_epochs = 20
-    batch_size = 200
-    train_data = BPNN_Dataset(all_lines,traces,labels,transform=transforms.ToTensor(),train=True)
-    train_loader = torch.utils.data.DataLoader(dataset=train_data,batch_size=batch_size,shuffle=True)
-    test_data = BPNN_Dataset(all_lines,traces,labels,transform=transforms.ToTensor(),train=False)
-    test_loader = torch.utils.data.DataLoader(dataset=test_data,batch_size=1,shuffle=False)
-    model = NeuralNet(len(all_lines),3,1).to(device)
-    criterion = nn.MSELoss()
-    # optimizer = torch.optim.SGD(model.parameters(),lr=learning_rate)
-    optimizer = torch.optim.Adam(model.parameters(),lr=learning_rate)
+# def BPNN(all_lines,traces,labels):
+#     num_epochs = 20
+#     batch_size = 200
+#     train_data = BPNN_Dataset(all_lines,traces,labels,transform=transforms.ToTensor(),train=True)
+#     train_loader = torch.utils.data.DataLoader(dataset=train_data,batch_size=batch_size,shuffle=True)
+#     test_data = BPNN_Dataset(all_lines,traces,labels,transform=transforms.ToTensor(),train=False)
+#     test_loader = torch.utils.data.DataLoader(dataset=test_data,batch_size=1,shuffle=False)
+#     model = NeuralNet(len(all_lines),3,1).to(device)
+#     criterion = nn.MSELoss()
+#     # optimizer = torch.optim.SGD(model.parameters(),lr=learning_rate)
+#     optimizer = torch.optim.Adam(model.parameters(),lr=learning_rate)
 
-    ### train the network
+#     ### train the network
     
-    for epoch in range(num_epochs):
-        for i,(data,label) in enumerate(train_loader):
-            data = data.to(device)
-            label = label.to(device)
+#     for epoch in range(num_epochs):
+#         for i,(data,label) in enumerate(train_loader):
+#             data = data.to(device)
+#             label = label.to(device)
 
-            outputs = model(data)
-            # print(outputs)
-            # print(label)
-            loss = criterion(outputs,label)
+#             outputs = model(data)
+#             # print(outputs)
+#             # print(label)
+#             loss = criterion(outputs,label)
 
-            optimizer.zero_grad()
-            loss.backward()
-            optimizer.step()
+#             optimizer.zero_grad()
+#             loss.backward()
+#             optimizer.step()
 
-            if (i+1) % 5 == 0:
-                print('Epoch [{}/{}], Step[{}/{}], Loss: {:.4f}'.format(epoch+1,num_epochs,i+1,len(train_loader),loss.item()))
+#             if (i+1) % 5 == 0:
+#                 print('Epoch [{}/{}], Step[{}/{}], Loss: {:.4f}'.format(epoch+1,num_epochs,i+1,len(train_loader),loss.item()))
 
-    suspicious = []
-    with torch.no_grad():
-        for i,(data, label) in enumerate(test_loader):
-            output = model(data)
-            suspicious.append([output.item(),all_lines[i]])
-    suspicious.sort(reverse=True)
-    return suspicious
+#     suspicious = []
+#     with torch.no_grad():
+#         for i,(data, label) in enumerate(test_loader):
+#             output = model(data)
+#             suspicious.append([output.item(),all_lines[i]])
+#     suspicious.sort(reverse=True)
+#     return suspicious
 
 def get_success_cover_information(line,traces,labels):
     ncs = 0.0
@@ -284,7 +284,7 @@ def sus_analysis(lines,sus_list,output_f):
             min_rank = 10000
             for line in line_nos:
                 for i in range(0,len(sus)):
-                    if line in sus[i][1]:
+                    if line == sus[i][1]:
                         print('line no %s rank #%d sus : %f'%(line,i,sus[i][0]))
                         if i < min_rank:
                             min_rank = i
@@ -417,7 +417,7 @@ def mainRecord(config,std):
 
 if __name__ == '__main__':
     config = parserConfig()
-    for std in np.arange(4,10.5,1):
+    for std in np.arange(4.0,10.5,1):
         mainRecord(config,std)
     
         

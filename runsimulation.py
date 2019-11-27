@@ -134,7 +134,7 @@ class SimRunner:
         home_location = self.vehicle.location.global_frame
         temp_state = []
         waypoint_num = 3
-        T = 4
+        T = 5
         ## first mission : guided mode
         for i in range(0,5):
             current_location = self.vehicle.location.global_frame

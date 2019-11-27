@@ -33,10 +33,7 @@ def recoverAllFiles():
         
 def run(config):
     if config['real_life'] == 'True':
-        if config['mutiple_bugs'] == 'True':
-            group = list(range(0,len(real_life_bug_group)))
-        else:
-            group = [3,4,5,6,7]
+        group = [3,4,5,6,7,8,9]
     else:
         group = [0,1,3,6,10,11,12,14]
         # group = bug_group
@@ -47,14 +44,13 @@ def run(config):
         bug_id_list = random.sample(group,1)
         # bug_id_list = random.sample(list(range(0,len(group))),1)
     print(bug_id_list)
+    #bug_id_list = [9]
     start = config['start']
     end = config['end']
     recoverAllFiles()
     inject_bugs(bug_id_list,config)
-#     for i in bug_id_list:
-#         os.system('cp /home/cedric/Desktop/copterTest/0/' + group[i]['file'] + ' /home/cedric/Desktop/arduPilot/' + group[i]['file'])
     os.chdir(config['root_dir'])
-    cfg_name = 'new_start_'+str(start)+'.ini'
+    cfg_name = 'back_start_'+str(start)+'.ini'
     os.system('cp monkey-copter/config.ini experiment/'+cfg_name)
     writeConfig(cfg_name,bug_id_list,start,end)
     os.system('make sitl -j4')
