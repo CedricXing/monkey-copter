@@ -321,8 +321,8 @@ real_life_target_bugs = [
     'return MAX(ToDeg(_althold_lean_angle_max), AC_ATTITUDE_CONTROL_ANGLE_LIMIT_MIN) * 100.0f;', # 7
     'if ((vector_length > max_length) && is_positive(vector_length))', # 8
     '/*target*/_vel_desired.z = 0.0f;', # 9
-    '_wp_radius_cm = MAX(_wp_radius_cm, WPNAV_WP_RADIUS_MIN);', # 10
-    '_track_length_xy = safe_sqrt(sq(pos_delta.x)+sq(pos_delta.y));', # 11
+    # '_wp_radius_cm = MAX(_wp_radius_cm, WPNAV_WP_RADIUS_MIN);', # 10
+    # '_track_length_xy = safe_sqrt(sq(pos_delta.x)+sq(pos_delta.y));', # 11
 ]
 
 real_life_mutated_bugs = [
@@ -336,8 +336,8 @@ real_life_mutated_bugs = [
     '/*!! BUG !! */ return ToDeg(_althold_lean_angle_max) * 100.0f;', # 7
     '/*!! BUG !! */ if ((vector_length > max_length) && is_positive(max_length))', # 8
     '/*!! BUG !! */ ///*target*/_vel_desired.z = 0.0f;', # 9
-    '/*!! BUG !! */ /*_wp_radius_cm = MAX(_wp_radius_cm, WPNAV_WP_RADIUS_MIN);*/', # 10
-    '/*!! BUG !! */ /*_track_length_xy = safe_sqrt(sq(pos_delta.x)+sq(pos_delta.y));*/', # 11
+    # '/*!! BUG !! */ /*_wp_radius_cm = MAX(_wp_radius_cm, WPNAV_WP_RADIUS_MIN);*/', # 10
+    # '/*!! BUG !! */ /*_track_length_xy = safe_sqrt(sq(pos_delta.x)+sq(pos_delta.y));*/', # 11
 ]
 
 real_life_bug_group = [
@@ -387,18 +387,18 @@ real_life_bug_group = [
         'start':11000000,
         'lineno':[287]
     }, # 7
-    {
-        'file':'libraries/AC_WPNav/AC_WPNav.cpp',
-        'indices':[10],
-        'start':0,
-        'lineno':[95]
-    }, # 8
-    {
-        'file':'libraries/AC_WPNav/AC_WPNav.cpp',
-        'indices':[11],
-        'start':1,
-        'lineno':[234]
-    }, # 9
+    # {
+    #     'file':'libraries/AC_WPNav/AC_WPNav.cpp',
+    #     'indices':[10],
+    #     'start':0,
+    #     'lineno':[95]
+    # }, # 8
+    # {
+    #     'file':'libraries/AC_WPNav/AC_WPNav.cpp',
+    #     'indices':[11],
+    #     'start':1,
+    #     'lineno':[234]
+    # }, # 9
 ]
 # # Single Bug
 # for i, bug in enumerate(bug_group):

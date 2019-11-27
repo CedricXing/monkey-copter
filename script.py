@@ -33,7 +33,10 @@ def recoverAllFiles():
         
 def run(config):
     if config['real_life'] == 'True':
-        group = [3,4,5,6,7,8,9]
+        if config['mutiple_bugs'] == 'True':
+            group = list(range(0,len(real_life_bug_group)))
+        else:
+            group = [3,4,5,6,7]
     else:
         group = [0,1,3,6,10,11,12,14]
         # group = bug_group
