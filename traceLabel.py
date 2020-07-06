@@ -24,6 +24,17 @@ def simulationResultClean(cfg,index_from,index_to):
         states.append(temp)
     return states,profiles
 
+def simulationResultCleanHR(cfg,index_from,index_to):
+    dir = cfg.get('param','root_dir')+'experiment/output/PA/0/'
+    states = []
+    for simulate_id in range(index_from,index_to+1):
+        state = np.load(dir + 'states_np_%d_0.npy'%simulate_id)
+        temp = []
+        for s in state:
+            temp.append([[x[0],x[1],x[2],x[6],x[7],x[8]] for x in s])
+        states.append(temp)
+    return states
+
 def labelTraces_LR(states=None,profiles=None,std=6):
     true_labels = 0
     labels = []
@@ -43,6 +54,29 @@ def labelTraces_LR(states=None,profiles=None,std=6):
             if not LinearRegressionBasedLabel(state_temp,profile_temp,std=std):
                 label = False
                 break
+        if label:
+            true_labels += 1
+            labels.append(0)
+        else:
+            labels.append(1)
+            false_id.append(simulate_id)
+    print('total traces:%d'%len(states))
+    print('positive labels:%d'%(len(states)-true_labels))
+    return labels,false_id
+
+def labelTraces_HR(states=None,profiles=None,std=6):
+    true_labels = 0
+    labels = []
+    false_id = []
+    for simulate_id,state in enumerate(states):
+        profile = profiles[simulate_id]
+        label = True
+        for mission_id in range(0,len(state)):
+            state_temp = state[mission_id]
+            for s in state_temp:
+                if np.abs(s[3]) > 31.5 or np.abs(s[4]) > 28.16 or np.abs(s[5]) > 30:
+                    label = False
+                    break
         if label:
             true_labels += 1
             labels.append(0)

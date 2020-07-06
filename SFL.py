@@ -320,8 +320,9 @@ def analysis(cfg,bug_id_list,output_f1,output_f2,std):
     for bug_id in bug_id_list:
         print(str(bug_id) + ':' + group[bug_id]['file'])
     states,profiles = simulationResultClean(cfg,start,end-1)
+    states_HR = simulationResultClean(cfg,start,end - 1)
     labels1,positive1 = labelTraces_LR(states,profiles,std)
-    labels2,positive2 = labelTraces_LR1(states,profiles,std)
+    labels2,positive2 = labelTraces_HR(states,profiles,std)
     positive_id = set()
     for i in range(0,len(traces)):
         for bug_id in bug_id_list:
@@ -403,8 +404,8 @@ def mainRecord(config,std):
     record_path = config['root_dir'] + 'experiment/'
     record_files = [f for f in os.listdir(record_path) if f.startswith('start') ]
     print(record_files)
-    output_f1 = open('arti_5_' + str(std) + '_1.log1','w')
-    output_f2 = open('arti_5_' + str(std) + '_1.log2','w')
+    output_f1 = open('real_5_' + str(std) + '_1.log1','w')
+    output_f2 = open('real_5_' + str(std) + '_1.log2','w')
     for record_file in record_files:
         print(record_file)
         cfg = ConfigParser()
