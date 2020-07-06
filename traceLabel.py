@@ -69,7 +69,6 @@ def labelTraces_HR(states=None,profiles=None,std=6):
     labels = []
     false_id = []
     for simulate_id,state in enumerate(states):
-        profile = profiles[simulate_id]
         label = True
         for mission_id in range(0,len(state)):
             state_temp = state[mission_id]

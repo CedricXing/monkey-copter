@@ -320,9 +320,9 @@ def analysis(cfg,bug_id_list,output_f1,output_f2,std):
     for bug_id in bug_id_list:
         print(str(bug_id) + ':' + group[bug_id]['file'])
     states,profiles = simulationResultClean(cfg,start,end-1)
-    states_HR = simulationResultClean(cfg,start,end - 1)
+    states_HR = simulationResultCleanHR(cfg,start,end - 1)
     labels1,positive1 = labelTraces_LR(states,profiles,std)
-    labels2,positive2 = labelTraces_HR(states,profiles,std)
+    labels2,positive2 = labelTraces_HR(states_HR,profiles,std)
     positive_id = set()
     for i in range(0,len(traces)):
         for bug_id in bug_id_list:
