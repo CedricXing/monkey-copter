@@ -53,7 +53,7 @@ def run(config):
     recoverAllFiles()
     inject_bugs(bug_id_list,config)
     os.chdir(config['root_dir'])
-    cfg_name = 'back_start_'+str(start)+'.ini'
+    cfg_name = 'foo_'+str(start)+'.ini'
     os.system('cp monkey-copter/config.ini experiment/'+cfg_name)
     writeConfig(cfg_name,bug_id_list,start,end)
     os.system('make sitl -j4')
