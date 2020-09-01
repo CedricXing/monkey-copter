@@ -306,15 +306,15 @@ def parserConfig():
     config['rounds'] = int(cfg.get('param','rounds'))
     return config
 
-def analysis(cfg,bug_id_list,output_f1,output_f2,std):
+def analysis(cfg,bug_id_list,output_f1,output_f2,std,start,end):
     if cfg.get('param','real_life') == 'True':
         group = real_life_bug_group
     else:
         group = bug_group
     print(bug_id_list)
     all_lines = statics(bug_id_list,group,cfg)
-    start = int(cfg.get('param','start'))
-    end = int(cfg.get('param','end'))
+    start = start
+    end = end
     traces = executionTracesClean(bug_id_list,group,start,end,cfg)
     print(len(traces))
     for bug_id in bug_id_list:
@@ -402,7 +402,7 @@ def analysis(cfg,bug_id_list,output_f1,output_f2,std):
 
 def mainRecord(config,std):
     record_path = config['root_dir'] + 'experiment/'
-    record_files = [f for f in os.listdir(record_path) if f.startswith('start') ]
+    record_files = [f for f in os.listdir(record_path) if f.startswith('foo') ]
     print(record_files)
     output_f1 = open('real_5_' + str(std) + '_1.log1','w')
     output_f2 = open('real_5_' + str(std) + '_1.log2','w')
@@ -412,7 +412,13 @@ def mainRecord(config,std):
         cfg.read(record_path+record_file)
         temp = cfg.get('param','bug')[1:-1]
         bug_id_list = [int(t.strip()) for t in temp.split(',')]
-        analysis(cfg,bug_id_list,output_f1,output_f2,std)
+        start = int(cfg.get('param','start'))
+        end = int(cfg.get('param','end'))
+        delta = (end - start) / 3
+        startArr = [start,start + delta, start + 2 * delta]
+        endArr = [start + delta, start + 2 * delta,end]
+        for i in range(len(startArr)):
+            analysis(cfg,bug_id_list,output_f1,output_f2,std,startArr[i],endArr[i])
         output_f1.write('------\n')
         output_f2.write('------\n')
 
