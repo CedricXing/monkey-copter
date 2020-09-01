@@ -414,7 +414,7 @@ def mainRecord(config,std):
         bug_id_list = [int(t.strip()) for t in temp.split(',')]
         start = int(cfg.get('param','start'))
         end = int(cfg.get('param','end'))
-        delta = (end - start) / 3
+        delta = int((end - start) / 3)
         startArr = [start,start + delta, start + 2 * delta]
         endArr = [start + delta, start + 2 * delta,end]
         for i in range(len(startArr)):
