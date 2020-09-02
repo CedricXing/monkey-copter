@@ -77,7 +77,7 @@ def labelTraces_HR(states=None,profiles=None,std=6):
                 if np.abs(s[3]) > 31.5 or np.abs(s[4]) > 28.16 or np.abs(s[5]) > 30:
                     label = False
                     break
-                if np.sqrt(np.pow(s[3],2) + np.pow(s[4],2) + np.pow(s[5],2)) > 20:
+                if np.sqrt(np.power(s[3],2) + np.power(s[4],2) + np.power(s[5],2)) > 20:
                     label = False
                     break
                 if len(pre_state) == 0:

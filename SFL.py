@@ -419,8 +419,8 @@ def mainRecord(config,std):
         endArr = [start + delta, start + 2 * delta,end]
         for i in range(len(startArr)):
             analysis(cfg,bug_id_list,output_f1,output_f2,std,startArr[i],endArr[i])
-        output_f1.write('------\n')
-        output_f2.write('------\n')
+            output_f1.write('------\n')
+            output_f2.write('------\n')
 
 if __name__ == '__main__':
     config = parserConfig()
