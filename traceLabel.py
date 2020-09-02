@@ -31,7 +31,7 @@ def simulationResultCleanHR(cfg,index_from,index_to):
         state = np.load(dir + 'states_np_%d_0.npy'%simulate_id)
         temp = []
         for s in state:
-            temp.append([[x[0],x[1],x[2],x[6],x[7],x[8]] for x in s])
+            temp.append([[x[3],x[4],x[5],x[6],x[7],x[8]] for x in s])
         states.append(temp)
     return states
 
@@ -72,10 +72,21 @@ def labelTraces_HR(states=None,profiles=None,std=6):
         label = True
         for mission_id in range(0,len(state)):
             state_temp = state[mission_id]
+            pre_state = []
             for s in state_temp:
                 if np.abs(s[3]) > 31.5 or np.abs(s[4]) > 28.16 or np.abs(s[5]) > 30:
                     label = False
                     break
+                if np.sqrt(np.pow(s[3],2) + np.pow(s[4],2) + np.pow(s[5],2)) > 20:
+                    label = False
+                    break
+                if len(pre_state) == 0:
+                    pre_state = s
+                elif np.abs(s[0] - pre_state[0]) / 0.1 > 3.5 or np.abs(s[2] - pre_state[2]) / 0.1 > 3.6:
+                    label = False
+                    break
+            if label == False:
+                break
         if label:
             true_labels += 1
             labels.append(0)
