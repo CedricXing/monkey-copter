@@ -175,40 +175,40 @@ class SimRunner:
                 # print_info(self.vehicle)
             self.states.append(temp_state)
         
-        ## third mission : auto mode
-        cmds = self.vehicle.commands
-        cmds.clear()
-        waypoint_in_auto = [random.uniform(0.0002,0.0003)/waypoint_num,random.uniform(0.0002,0.0003)/waypoint_num,random.uniform(20,30)/waypoint_num]
-        for j in range(1,waypoint_num+1):
-            profile = LocationGlobal(current_location.lat+target_delta[0]*j,current_location.lon+target_delta[1]*j,current_location.alt+target_delta[2]*j)
-            self.profiles.append([profile.lat,profile.lon,profile.alt])
-            cmds.add(Command(0,0,0,mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,mavutil.mavlink.MAV_CMD_NAV_WAYPOINT,0,0,0,0,0,0,profile.lat,profile.lon,profile.alt))
-        cmds.upload()
-        self.vehicle.commands.next = 0
-        self.vehicle.mode = VehicleMode('AUTO')
-        for j in range(0,waypoint_num):
-            current_t = 0
-            temp_state = []
-            while current_t < T:
-                temp_state.append([self.vehicle.location.global_frame.lat,self.vehicle.location.global_frame.lon,self.vehicle.location.global_frame.alt
-                ,self.vehicle.attitude.pitch,self.vehicle.attitude.yaw,self.vehicle.attitude.roll,self.vehicle.velocity[0],self.vehicle.velocity[1],self.vehicle.velocity[2]])
-                time.sleep(0.1)
-                current_t += 0.1
-            self.vehicle.commands.next += 1
-            self.states.append(temp_state)
+        # ## third mission : auto mode
+        # cmds = self.vehicle.commands
+        # cmds.clear()
+        # waypoint_in_auto = [random.uniform(0.0002,0.0003)/waypoint_num,random.uniform(0.0002,0.0003)/waypoint_num,random.uniform(20,30)/waypoint_num]
+        # for j in range(1,waypoint_num+1):
+        #     profile = LocationGlobal(current_location.lat+target_delta[0]*j,current_location.lon+target_delta[1]*j,current_location.alt+target_delta[2]*j)
+        #     self.profiles.append([profile.lat,profile.lon,profile.alt])
+        #     cmds.add(Command(0,0,0,mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,mavutil.mavlink.MAV_CMD_NAV_WAYPOINT,0,0,0,0,0,0,profile.lat,profile.lon,profile.alt))
+        # cmds.upload()
+        # self.vehicle.commands.next = 0
+        # self.vehicle.mode = VehicleMode('AUTO')
+        # for j in range(0,waypoint_num):
+        #     current_t = 0
+        #     temp_state = []
+        #     while current_t < T:
+        #         temp_state.append([self.vehicle.location.global_frame.lat,self.vehicle.location.global_frame.lon,self.vehicle.location.global_frame.alt
+        #         ,self.vehicle.attitude.pitch,self.vehicle.attitude.yaw,self.vehicle.attitude.roll,self.vehicle.velocity[0],self.vehicle.velocity[1],self.vehicle.velocity[2]])
+        #         time.sleep(0.1)
+        #         current_t += 0.1
+        #     self.vehicle.commands.next += 1
+        #     self.states.append(temp_state)
 
         #### fourth mission : rtl mode
-        self.vehicle.mode = VehicleMode('RTL')
-        for j in range(0,waypoint_num):
-            self.profiles.append([home_location.lat,home_location.lon,home_location.alt])
-            current_t = 0
-            temp_state = []
-            while current_t < T:
-                temp_state.append([self.vehicle.location.global_frame.lat,self.vehicle.location.global_frame.lon,self.vehicle.location.global_frame.alt
-                ,self.vehicle.attitude.pitch,self.vehicle.attitude.yaw,self.vehicle.attitude.roll,self.vehicle.velocity[0],self.vehicle.velocity[1],self.vehicle.velocity[2]])
-                time.sleep(0.1)
-                current_t += 0.1
-            self.states.append(temp_state)
+        # self.vehicle.mode = VehicleMode('RTL')
+        # for j in range(0,waypoint_num):
+        #     self.profiles.append([home_location.lat,home_location.lon,home_location.alt])
+        #     current_t = 0
+        #     temp_state = []
+        #     while current_t < T:
+        #         temp_state.append([self.vehicle.location.global_frame.lat,self.vehicle.location.global_frame.lon,self.vehicle.location.global_frame.alt
+        #         ,self.vehicle.attitude.pitch,self.vehicle.attitude.yaw,self.vehicle.attitude.roll,self.vehicle.velocity[0],self.vehicle.velocity[1],self.vehicle.velocity[2]])
+        #         time.sleep(0.1)
+        #         current_t += 0.1
+        #     self.states.append(temp_state)
         self.vehicle.close()
         self.sitl.stop()
 

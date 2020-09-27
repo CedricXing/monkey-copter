@@ -57,7 +57,7 @@ bug_num_to_insert = 3
 # ]
 target_statements = [
     'linear_distance = _accel_z_cms / (2.0f * _p_pos_z.kP() * _p_pos_z.kP());', # 0 line:430
-    'leash_length = POSCONTROL_LEASH_LENGTH_MIN', # 1 good line:1118
+    '_speed_cms = speed_cms;', #1 621
     'stopping_point.z = curr_pos_z + (linear_distance + curr_vel_z * curr_vel_z / (2.0f * _accel_z_cms));', # 2 not good 427
     'stopping_point.z = curr_pos_z - (linear_distance + curr_vel_z * curr_vel_z / (2.0f * _accel_z_cms))', # 3 not good 432
     '_pos_target.z = curr_alt + _leash_up_z;', # 4 514 good
@@ -66,9 +66,9 @@ target_statements = [
     '_accel_cms = accel_cmss;', # 7 611
     '_vel_target.z = _speed_down_cms;', # 8 532
     '_vel_target.z = _speed_up_cms;', # 9 536
-    'vector_x *= (max_length / vector_length);', #10 # 1167
-    'vector_y *= (max_length / vector_length);', #11 #1167
-    '_speed_cms = speed_cms;', #12 621
+    '/*target*/_vel_desired.z = 0.0f;', # 10
+    '', #11 
+    '', #12
     '', #13
     '', #14
     '', #15
@@ -121,7 +121,7 @@ target_statements = [
 
 mutated_statements = [
     '/* BUG!! */ linear_distance = _accel_z_cms / (2.0f * _p_pos_z.kP());', # 0
-    '/* BUG!! */ //leash_length = POSCONTROL_LEASH_LENGTH_MIN', # 1
+    '/* BUG!! */ _speed_cms = -speed_cms;', #1
     '/* BUG!! */ stopping_point.z =curr_pos_z - (linear_distance + curr_vel_z * curr_vel_z / (2.0f * _accel_z_cms));', # 2
     '/* BUG!! */ stopping_point.z = curr_pos_z + (linear_distance + curr_vel_z * curr_vel_z / (2.0f * _accel_z_cms));', # 3
     '/* BUG!! */ _pos_target.z = curr_alt - _leash_up_z;', # 4
@@ -130,9 +130,9 @@ mutated_statements = [
     '/* BUG!! */ _accel_cms = -accel_cmss;', # 7
     '/* BUG!! */ _vel_target.z =_speed_up_cms;', # 8
     '/* BUG!! */ _vel_target.z = _speed_down_cms;', # 9
-    '/* BUG!! */ vector_x = (max_length / vector_length);', # 10
-    '/* BUG!! */ vector_y = (max_length / vector_length);', # 11
-    '/* BUG!! */ _speed_cms = -speed_cms;', #12
+    '/*!! BUG !! */ ///*target*/_vel_desired.z = 0.0f;', # 10
+    '', #11
+    '', #12
     '', #13
     '', #14
     '', #15
@@ -196,10 +196,10 @@ bug_group = [
      "lineno" : [430],
      "type": 'Semantic'}, #0
      {"file": "libraries/AC_AttitudeControl/AC_PosControl.cpp",
-     "location": "libraries/AC_AttitudeControl/AC_PosControl.cpp-pos_to_rate_xy-887",
+     "location": "libraries/AC_AttitudeControl/AC_PosControl.cpp-get_stopping_point_z-292",
      "indices": [1],
-     "start" : 200000,
-     "lineno" : [1118],
+     "start" : 900000,
+     "lineno" : [621],
      "type": 'Semantic'}, #1
     {"file": "libraries/AC_AttitudeControl/AC_PosControl.cpp",
      "location": "libraries/AC_AttitudeControl/AC_PosControl.cpp-calc_leash_length-1048",
@@ -225,27 +225,17 @@ bug_group = [
      "start" : 600000,
      "lineno" : [611],
      'type': 'Semantic'}, #5
+     {
+        'file':'libraries/AC_AttitudeControl/AC_PosControl.cpp',
+        'indices':[8],
+        'start':11000000,
+        'lineno':[287]}, # 6
     # {"file": "libraries/AC_AttitudeControl/AC_PosControl.cpp",
     #  "location": "libraries/AC_AttitudeControl/AC_PosControl.cpp-pos_to_rate_z-387",
     #  "indices": [8,9],
     #  "start" : 700000,
     #  "lineno" : [532,536],
     #  "type": 'Semantic'}, #6
-    {"file": "libraries/AC_AttitudeControl/AC_PosControl.cpp",
-     "location": "libraries/AC_AttitudeControl/AC_PosControl.cpp-get_stopping_point_z-290",
-     "indices": [10,11],
-     "start" : 800000,
-     "lineno" : [1167],
-     "type": 'Semantic'}, #6
-    # {"file": "libraries/AC_AttitudeControl/AC_PosControl.cpp",
-    #  "location": "libraries/AC_AttitudeControl/AC_PosControl.cpp-get_stopping_point_z-292",
-    #  "indices": [12],
-    #  "start" : 900000,
-    #  "lineno" : [621],
-    #  "type": 'Semantic'}, #8
-
-
-
 
 
     {"file": "libraries/AC_WPNav/AC_WPNav.cpp",
@@ -312,30 +302,31 @@ bug_group = [
 
 real_life_target_bugs = [
     'float acro_level_mix = constrain_float(1-float(MAX(MAX(abs(roll_in), abs(pitch_in)), abs(yaw_in))/4500.0), 0, 1)*ahrs.cos_pitch();', # 0 mode acro
-    '/* 0 */ loiter_nav->clear_pilot_desired_acceleration();',# 1 mode auto
-    '/* 1 */ loiter_nav->clear_pilot_desired_acceleration();',# 2 mode auto
-    'loiter_nav->clear_pilot_desired_acceleration();',# 3 mode rtl
-    'if (motors->get_spool_state() > AP_Motors::SpoolState::GROUND_IDLE)', # 4
-    '_rate_target_ang_vel.x += constrain_float(attitude_error_vector.y, -M_PI / 4, M_PI / 4) * _ahrs.get_gyro().z;', # 5
-    '_rate_target_ang_vel.y += -constrain_float(attitude_error_vector.x, -M_PI / 4, M_PI / 4) * _ahrs.get_gyro().z;', # 6
-    'return MAX(ToDeg(_althold_lean_angle_max), AC_ATTITUDE_CONTROL_ANGLE_LIMIT_MIN) * 100.0f;', # 7
-    'if ((vector_length > max_length) && is_positive(vector_length))', # 8
-    '/*target*/_vel_desired.z = 0.0f;', # 9
+    'leash_length = POSCONTROL_LEASH_LENGTH_MIN', # 1 good line:1118
+    'loiter_nav->clear_pilot_desired_acceleration();',# 2 mode rtl
+    'if (motors->get_spool_state() > AP_Motors::SpoolState::GROUND_IDLE)', # 3
+    '_rate_target_ang_vel.x += constrain_float(attitude_error_vector.y, -M_PI / 4, M_PI / 4) * _ahrs.get_gyro().z;', # 4
+    '_rate_target_ang_vel.y += -constrain_float(attitude_error_vector.x, -M_PI / 4, M_PI / 4) * _ahrs.get_gyro().z;', # 5
+    'return MAX(ToDeg(_althold_lean_angle_max), AC_ATTITUDE_CONTROL_ANGLE_LIMIT_MIN) * 100.0f;', # 6
+    'if ((vector_length > max_length) && is_positive(vector_length))', # 7
+    'vector_x *= (max_length / vector_length);', #8 # 1167
+    'vector_y *= (max_length / vector_length);', #9 #1167
     # '_wp_radius_cm = MAX(_wp_radius_cm, WPNAV_WP_RADIUS_MIN);', # 10
     # '_track_length_xy = safe_sqrt(sq(pos_delta.x)+sq(pos_delta.y));', # 11
 ]
 
 real_life_mutated_bugs = [
     '/*!! BUG !! */ float acro_level_mix = constrain_float(float(1-MAX(MAX(abs(roll_in), abs(pitch_in)), abs(yaw_in))/4500.0), 0, 1)*ahrs.cos_pitch();', # 0 mode acro
-    '/*!! BUG !! */ //loiter_nav->clear_pilot_desired_acceleration();', # 1 mode auto
-    '/*!! BUG !! */ //loiter_nav->clear_pilot_desired_acceleration();', # 2 mode auto
-    '/*!! BUG !! */ //loiter_nav->clear_pilot_desired_acceleration();', # 3 mode rtl
-    '/*!! BUG !! */ if (motors->get_spool_state() != AP_Motors::SpoolState::GROUND_IDLE)', # 4 full traces
-    '/*!! BUG !! */ _rate_target_ang_vel.x += attitude_error_vector.y * _ahrs.get_gyro().z;', # 5 full traces
-    '/*!! BUG !! */ _rate_target_ang_vel.y += -attitude_error_vector.x * _ahrs.get_gyro().z;', # 6
-    '/*!! BUG !! */ return ToDeg(_althold_lean_angle_max) * 100.0f;', # 7
-    '/*!! BUG !! */ if ((vector_length > max_length) && is_positive(max_length))', # 8
-    '/*!! BUG !! */ ///*target*/_vel_desired.z = 0.0f;', # 9
+    '/* BUG!! */ //leash_length = POSCONTROL_LEASH_LENGTH_MIN', # 1
+    '/*!! BUG !! */ //loiter_nav->clear_pilot_desired_acceleration();', # 2 mode rtl
+    '/*!! BUG !! */ if (motors->get_spool_state() != AP_Motors::SpoolState::GROUND_IDLE)', # 3 full traces
+    '/*!! BUG !! */ _rate_target_ang_vel.x += attitude_error_vector.y * _ahrs.get_gyro().z;', # 4 full traces
+    '/*!! BUG !! */ _rate_target_ang_vel.y += -attitude_error_vector.x * _ahrs.get_gyro().z;', # 5
+    '/*!! BUG !! */ return ToDeg(_althold_lean_angle_max) * 100.0f;', # 6
+    '/*!! BUG !! */ if ((vector_length > max_length) && is_positive(max_length))', # 7
+    '/* BUG!! */ vector_x = (max_length / vector_length);', # 8
+    '/* BUG!! */ vector_y = (max_length / vector_length);', # 9
+    
     # '/*!! BUG !! */ /*_wp_radius_cm = MAX(_wp_radius_cm, WPNAV_WP_RADIUS_MIN);*/', # 10
     # '/*!! BUG !! */ /*_track_length_xy = safe_sqrt(sq(pos_delta.x)+sq(pos_delta.y));*/', # 11
 ]
@@ -343,50 +334,48 @@ real_life_mutated_bugs = [
 real_life_bug_group = [
     {'file':'ArduCopter/mode_acro.cpp',
     'indices':[0],
-    'start':4000000,
     'lineno':[147]
     }, # 0
-    {
-        'file':'ArduCopter/mode_auto.cpp',
-        'indices':[1,2],
-        'start':5000000,
-        'lineno':[836,933]
-    }, # 1
-    {   'file':'ArduCopter/mode_rtl.cpp',
-        'indices':[3],
-        'start':6000000,
-        'lineno':[385],
-    }, # 2
+    {"file": "libraries/AC_AttitudeControl/AC_PosControl.cpp",
+     "indices": [1],
+     "lineno" : [1118],
+     "type": 'Semantic'
+     }, # 1
+    # {   'file':'ArduCopter/mode_rtl.cpp',
+    #     'indices':[2],
+    #     'start':6000000,
+    #     'lineno':[385],
+    # }, # 2
     {
         'file':'ArduCopter/motors.cpp',
-        'indices':[4],
+        'indices':[3],
         'start':8000000,
         'lineno':[97]
+    }, # 2
+    {
+        'file':'libraries/AC_AttitudeControl/AC_AttitudeControl.cpp',
+        'indices':[4,5],
+        'start':9000000,
+        'lineno':[661]
     }, # 3
     {
         'file':'libraries/AC_AttitudeControl/AC_AttitudeControl.cpp',
-        'indices':[5,6],
-        'start':9000000,
-        'lineno':[661]
-    }, # 4
-    {
-        'file':'libraries/AC_AttitudeControl/AC_AttitudeControl.cpp',
-        'indices':[7],
+        'indices':[6],
         'start':10000000,
         'lineno':[954]
-    }, # 5
+    }, # 4
     {
         'file':'libraries/AC_AttitudeControl/AC_PosControl.cpp',
-        'indices':[8],
+        'indices':[7],
         'start':11000000,
         'lineno':[1167]
-    }, # 6
-    {
-        'file':'libraries/AC_AttitudeControl/AC_PosControl.cpp',
-        'indices':[9],
-        'start':11000000,
-        'lineno':[287]
-    }, # 7
+    }, # 5
+    {"file": "libraries/AC_AttitudeControl/AC_PosControl.cpp",
+     "indices": [8,9],
+     "start" : 800000,
+     "lineno" : [1167],
+     "type": 'Semantic'
+     }, # 6
     # {
     #     'file':'libraries/AC_WPNav/AC_WPNav.cpp',
     #     'indices':[10],
