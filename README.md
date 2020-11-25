@@ -1,4 +1,4 @@
-# Monkey-copter
+# ArduPilot Testbed Setup
 
 ### Set up ArduPilot development environment
 #### Get git
@@ -93,9 +93,35 @@ nohup python2.7 script.py &
 ```
 to run the monkey program as a background process. The simulation results will be exported to `experiment/output/` and the corresponding running configuration files will be exported to `experiment` for the future use in our proposed **Autoregression** labeling method. 
 
+# IP+CV Testbed Setup (based on Mac OS)
+
+### Anaconda Setup
+
+#### Install Anaconda
+[Anaconda](https://www.anaconda.com/) is a popular and free platform where packages, notebooks, projects and environments are shared. To install Anaconda, please follow the [official website](https://docs.anaconda.com/anaconda/install/). 
+
+After installing the anaconda, we need to change the `.zshrc` to add the path of anaconda. If you are using Zsh (Bash can be added similarly), try
+```
+export PATH=/Users/yourname/anaconda/bin:$PATH
+```
+Remember to modify the 'yourname' to your own username. Then, restart the terminal or `source ~/.zshrc` to make the modification come to effect.
+
+#### Create local conda environment
+Now, we create a local conda environment for IP+CV testbed. Since we use opencv3 and python2.7, we create a python environment called `opencv3_python27` by
+```
+conda create --name opencv3_python27 python=2.7
+```
+To activate this environment, use the command `conda activate opencv3_python27`. You can refer to more information about how to create local environments, activate the environments and deactivate them in the offical site.
+
+
+
+
 #### Run the Software Fault Localization(SFL) tools
 We have implemented 6 SFL tools including `Tarantula`, `Crosstab`, `BPNN`, `DStar`, `Ochiai`, `Ochiai2`. Specifically, `BPNN` is based on neural network and we implement it by [Pytorch](https://pytorch.org/) framework. So we need to install `pytorch` first. We recommend [Anaconda](https://www.anaconda.com/) to install the relative python packages. Go to the [Anaconda-download page](https://www.anaconda.com/distribution/) to download the `Anaconda` installation package and then install it. After that, try
 ```
 conda install pytorch torchvision cpuonly -c pytorch
 ```
 to install the cpuonly-version `pytorch`.
+
+
+
