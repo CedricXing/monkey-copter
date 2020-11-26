@@ -306,7 +306,7 @@ def parserConfig():
     config['rounds'] = int(cfg.get('param','rounds'))
     return config
 
-def analysis(cfg,bug_id_list,output_f1,output_f2,std,start,end):
+def analysis(cfg,bug_id_list,output_f1,std,start,end):
     if cfg.get('param','real_life') == 'True':
         group = real_life_bug_group
     else:
@@ -320,7 +320,6 @@ def analysis(cfg,bug_id_list,output_f1,output_f2,std,start,end):
     for bug_id in bug_id_list:
         print(str(bug_id) + ':' + group[bug_id]['file'])
     states,profiles = simulationResultClean(cfg,start,end-1)
-    states_HR = simulationResultCleanHR(cfg,start,end - 1)
     labels1,positive1 = labelTraces_LR(states,profiles,std)
     positive_id = set()
     for i in range(0,len(traces)):
@@ -392,7 +391,7 @@ def mainRecord(config,std):
         startArr = [start,start + delta, start + 2 * delta]
         endArr = [start + delta, start + 2 * delta,end]
         for i in range(len(startArr)):
-            analysis(cfg,bug_id_list,output_f1,output_f2,std,startArr[i],endArr[i])
+            analysis(cfg,bug_id_list,output_f1,std,startArr[i],endArr[i])
             output_f1.write('------\n')
 
 if __name__ == '__main__':
