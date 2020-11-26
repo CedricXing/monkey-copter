@@ -113,8 +113,39 @@ conda create --name opencv3_python27 python=2.7
 ```
 To activate this environment, use the command `conda activate opencv3_python27`. You can refer to more information about how to create local environments, activate the environments and deactivate them in the offical site.
 
+#### Install OpenCV3 and Python2.7
+The detailed installation tutorial of OpenCV3 and Python2.7 on Mac OS can be found by searching `macOS: Install Opencv 3 and Python 2.7`. The following configuration for **Cmake** is used on our own Mac OS machine:
+```
+cmake -D CMAKE_BUILD_TYPE=RELEASE \
+    -D CMAKE_INSTALL_PREFIX=/usr/local \
+    -D OPENCV_EXTRA_MODULES_PATH=~/Documents/ipcv/opencv_contrib/modules \
+    -D PYTHON2_LIBRARY=/Users/yourname/anaconda/envs/opencv3_python27/lib/python2.7/config/libpython2.7.a \
+    -D PYTHON2_INCLUDE_DIR=/Users/yourname/anaconda/envs/opencv3_python27/include/python2.7/ \
+    -D PYTHON2_NUMPY_INCLUDE_DIRS=/Users/yourname/anaconda/envs/opencv3_python27/lib/python2.7/site-packages/numpy/core/include \
+    -D PYTHON2_EXECUTABLE=/Users/yourname/anaconda/envs/opencv3_python27/bin/python2.7 \
+    -D BUILD_opencv_python2=ON \
+    -D BUILD_opencv_python3=OFF \
+    -D BUILD_NEW_PYTHON_SUPPORT=ON \
+    -D BUILD_PYTHON_SUPPORT=ON \
+    -D INSTALL_PYTHON_EXAMPLES=ON \
+    -D INSTALL_C_EXAMPLES=OFF \
+    -D BUILD_EXAMPLES=ON ..
+```
+Please modify the configuraton to your own path settings.
 
+#### Recompile Opencv3
+In the previous step, you have already compiled the native opencv3 in your own computer. If you insert bugs into opencv3 later, you can use the following commands to recompile and reinstall opencv3
+```
+make -j8
+make install
+```
 
+#### Install Other Python Libraries
+We also need to install `numpy`, `Pillow` and `SimpleWebSocketServer`. Try
+```
+pip install numpy Pillow
+pip install git+https://github.com/dpallot/simple-websocket-server.git
+```
 
 #### Run the Software Fault Localization(SFL) tools
 We have implemented 6 SFL tools including `Tarantula`, `Crosstab`, `BPNN`, `DStar`, `Ochiai`, `Ochiai2`. Specifically, `BPNN` is based on neural network and we implement it by [Pytorch](https://pytorch.org/) framework. So we need to install `pytorch` first. We recommend [Anaconda](https://www.anaconda.com/) to install the relative python packages. Go to the [Anaconda-download page](https://www.anaconda.com/distribution/) to download the `Anaconda` installation package and then install it. After that, try

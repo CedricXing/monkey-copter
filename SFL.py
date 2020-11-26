@@ -322,7 +322,6 @@ def analysis(cfg,bug_id_list,output_f1,output_f2,std,start,end):
     states,profiles = simulationResultClean(cfg,start,end-1)
     states_HR = simulationResultCleanHR(cfg,start,end - 1)
     labels1,positive1 = labelTraces_LR(states,profiles,std)
-    labels2,positive2 = labelTraces_HR(states_HR,profiles,std)
     positive_id = set()
     for i in range(0,len(traces)):
         for bug_id in bug_id_list:
@@ -341,52 +340,30 @@ def analysis(cfg,bug_id_list,output_f1,output_f2,std,start,end):
     for id in positive1:
         if id in negative_id:
             false_positive1 += 1
-    false_positive2 = 0
-    for id in positive2:
-        if id in negative_id:
-            false_positive2 += 1
     false_negative1 = 0
     for i in range(0,len(traces)):
         if i not in positive1 and i in positive_id:
             false_negative1 += 1
-    false_negative2 = 0
-    for i in range(0,len(traces)):
-        if i not in positive2 and i in positive_id:
-            false_negative2 += 1
 
     if len(negative_id) != 0:
         print('false positive rate1 : %f'%(float(false_positive1)/len(negative_id)))
         output_f1.write('fpr1 : %f\n'%(float(false_positive1)/len(negative_id)))
-        print('false positive rate2 : %f'%(float(false_positive2)/len(negative_id)))
-        output_f2.write('fpr2 : %f\n'%(float(false_positive2)/len(negative_id)))
     else:
         print('false positive rate1 : None')
         output_f1.write('fpr1 : None\n')
-        print('false positive rate2 : None')
-        output_f2.write('fpr2 : None\n')
     if len(positive_id) != 0:
         print('false negative rate1 : %f'%(float(false_negative1)/len(positive_id)))
         output_f1.write('fnr1 : %f\n'%(float(false_negative1)/len(positive_id)))
-        print('false negative rate2 : %f'%(float(false_negative2)/len(positive_id)))
-        output_f2.write('fnr2 : %f\n'%(float(false_negative2)/len(positive_id)))
     else:
         print('false negative rate1 : None')
         output_f1.write('fnr1 : None\n')
-        print('false negative rate2 : None')
-        output_f2.write('fnr2 : None\n')
 
     sus_tar1 = tarantula(all_lines,traces,labels1)
-    sus_tar2 = tarantula(all_lines,traces,labels2)
     sus_cro1 = crosstab(all_lines,traces,labels1)
-    sus_cro2 = crosstab(all_lines,traces,labels2)
     # sus_bp1 = BPNN(all_lines,traces,labels1)
-    # sus_bp2 = BPNN(all_lines,traces,labels2)
     # sus_tar1 = DStar(all_lines,traces,labels1)
-    # sus_tar2 = DStar(all_lines,traces,labels2)
     # sus_cro1 = Ochiai(all_lines,traces,labels1)
-    # sus_cro2 = Ochiai(all_lines,traces,labels2)
     sus_bp1 = Ochiai2(all_lines,traces,labels1)
-    sus_bp2 = Ochiai2(all_lines,traces,labels2)
 
     lines = []
     for bug_id in bug_id_list:
@@ -396,16 +373,13 @@ def analysis(cfg,bug_id_list,output_f1,output_f2,std,start,end):
         lines.append(temps)
     print(lines)
     sus_analysis(lines,[sus_tar1,sus_cro1,sus_bp1],output_f1)
-    sus_analysis(lines,[sus_tar2,sus_cro2,sus_bp2],output_f2)
     output_f1.write(str(len(all_lines))+'\n')
-    output_f2.write(str(len(all_lines))+'\n')
 
 def mainRecord(config,std):
     record_path = config['root_dir'] + 'experiment/'
     record_files = [f for f in os.listdir(record_path) if f.startswith('foo') ]
     print(record_files)
     output_f1 = open('real_5_' + str(std) + '_1.log1','w')
-    output_f2 = open('real_5_' + str(std) + '_1.log2','w')
     for record_file in record_files:
         print(record_file)
         cfg = ConfigParser()
@@ -420,7 +394,6 @@ def mainRecord(config,std):
         for i in range(len(startArr)):
             analysis(cfg,bug_id_list,output_f1,output_f2,std,startArr[i],endArr[i])
             output_f1.write('------\n')
-            output_f2.write('------\n')
 
 if __name__ == '__main__':
     config = parserConfig()
