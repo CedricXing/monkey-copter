@@ -114,7 +114,12 @@ conda create --name opencv3_python27 python=2.7
 To activate this environment, use the command `conda activate opencv3_python27`. You can refer to more information about how to create local environments, activate the environments and deactivate them in the offical site.
 
 #### Install OpenCV3 and Python2.7
-The detailed installation tutorial of OpenCV3 and Python2.7 on Mac OS can be found by searching `macOS: Install Opencv 3 and Python 2.7`. The following configuration for **Cmake** is used on our own Mac OS machine:
+The detailed installation tutorial of OpenCV3 and Python2.7 on Mac OS can be found by searching `macOS: Install Opencv 3 and Python 2.7`. Follow the Step 5, 6, 7, 8. Specifically, in Step 6, download `opencv` and `opencv_contrib` using the following commmands.
+```
+git clone https://github.com/CedricXing/lib_opencv
+```
+
+In Step 7, the following configuration for **Cmake** is used on our own Mac OS machine:
 ```
 cmake -D CMAKE_BUILD_TYPE=RELEASE \
     -D CMAKE_INSTALL_PREFIX=/usr/local \
