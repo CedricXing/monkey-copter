@@ -113,6 +113,7 @@ conda create --name opencv3_python27 python=2.7
 ```
 To activate this environment, use the command `conda activate opencv3_python27`. You can refer to more information about how to create local environments, activate the environments and deactivate them in the offical site.
 
+### OpenCV Setup
 #### Install OpenCV3 and Python2.7
 The detailed installation tutorial of OpenCV3 and Python2.7 on Mac OS can be found by searching `macOS: Install Opencv 3 and Python 2.7`. Follow the Step 5, 6, 7, 8. Specifically, in Step 6, download `opencv` and `opencv_contrib` using the following commmands.
 ```
@@ -138,8 +139,18 @@ cmake -D CMAKE_BUILD_TYPE=RELEASE \
 ```
 Please modify the configuraton to your own path settings.
 
+#### Link OpenCV to the conda environment
+After running `make install`, you should now see a file named `cv2.so` in `/usr/local/lib/python2.7/site-packages/cv2/python-2.7/cv2.so`. You need to sim-link this file to your conda virtual environment. First, enter the directory of your conda virtual environment by
+```
+cd ~/anaconda/envs/opencv3_python27/lib/python2.7/site-packages
+```
+Then, use the sim-link command
+```
+ln -s /usr/local/lib/python2.7/site-packages/cv2/python-2.7/cv2.so cv2.so
+```
+
 #### Recompile Opencv3
-In the previous step, you have already compiled the native opencv3 in your own computer. If you insert bugs into opencv3 later, you can use the following commands to recompile and reinstall opencv3
+In the previous step, you have already compiled the native opencv3 and link it to your conda virtual environment. If you insert bugs into opencv3 later, you can use the following commands to recompile and reinstall opencv3
 ```
 make -j8
 make install
@@ -151,6 +162,16 @@ We also need to install `numpy`, `Pillow` and `SimpleWebSocketServer`. Try
 pip install numpy Pillow
 pip install git+https://github.com/dpallot/simple-websocket-server.git
 ```
+### Build IP Plant
+#### Install Unity3D
+Download the version Unity 5.6.1f from [Unity](https://unity3d.com/). Since this tutorial is based on Mac OS, choose the Mac OS version. After installing Unity3D, download the IP Plant project from [here](https://surefire.comp.polyu.edu.hk/research/cps/software_engineering/). You need to revise the following file paths in `LQR_test.cs` to use the application.
+| name | meaning |
+|---- | ---- |
+|file_path | the directory will output physical trajectories | 
+|minor_file| the counter that records the current physical trajectory id|
+|ip_stm_minor| the counter of that records the current subject id |
+
+Modify them to the correct location of your own computer. Then, you can try building the IP Plant in Unity3D.
 
 #### Run the Software Fault Localization(SFL) tools
 We have implemented 6 SFL tools including `Tarantula`, `Crosstab`, `BPNN`, `DStar`, `Ochiai`, `Ochiai2`. Specifically, `BPNN` is based on neural network and we implement it by [Pytorch](https://pytorch.org/) framework. So we need to install `pytorch` first. We recommend [Anaconda](https://www.anaconda.com/) to install the relative python packages. Go to the [Anaconda-download page](https://www.anaconda.com/distribution/) to download the `Anaconda` installation package and then install it. After that, try
