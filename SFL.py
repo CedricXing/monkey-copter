@@ -151,11 +151,11 @@ def tarantula(all_lines,traces,labels):
     total_failed = sum(labels)
     if total_failed == 0:
         print('no positive labels')
-        return 
+        return [[1,""] for i in range(0,100)] + [[0,line] for line in all_lines]
     total_passed = len(labels) - total_failed
     if total_passed == 0:
         print('no negative labels')
-        return
+        return [[1,""] for i in range(0,100)] + [[0,line] for line in all_lines]
     for line in all_lines:
         ncs,ncf,nus,nuf = get_success_cover_information(line,traces,labels)
         nf = ncf + nuf
@@ -167,7 +167,6 @@ def tarantula(all_lines,traces,labels):
         suspicious.append([suspici,line])
     suspicious.sort(reverse=True)
     return suspicious
-    #return compressSameValue(suspicious)
     
 def DStar(all_lines,traces,labels):
     suspicious = []
@@ -252,7 +251,6 @@ def crosstab(all_lines,traces,labels):
             suspicious.append([-M,line])
     suspicious.sort(reverse=True)
     return suspicious
-    #return compressSameValue(suspicious)
     
 def print_line_info(all_lines,traces,lineno):
     result = []
