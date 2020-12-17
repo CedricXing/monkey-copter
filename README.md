@@ -172,13 +172,3 @@ Download the version Unity 5.6.1f from [Unity](https://unity3d.com/). Since this
 |ip_stm_minor| the counter of that records the current subject id |
 
 Modify them to the correct location of your own computer. Then, you can try building the IP Plant in Unity3D.
-
-#### Run the Software Fault Localization(SFL) tools
-We have implemented 6 SFL tools including `Tarantula`, `Crosstab`, `BPNN`, `DStar`, `Ochiai`, `Ochiai2`. Specifically, `BPNN` is based on neural network and we implement it by [Pytorch](https://pytorch.org/) framework. So we need to install `pytorch` first. We recommend [Anaconda](https://www.anaconda.com/) to install the relative python packages. Go to the [Anaconda-download page](https://www.anaconda.com/distribution/) to download the `Anaconda` installation package and then install it. After that, try
-```
-conda install pytorch torchvision cpuonly -c pytorch
-```
-to install the cpuonly-version `pytorch`.
-
-
-
