@@ -172,3 +172,21 @@ Download the version Unity 5.6.1f from [Unity](https://unity3d.com/). Since this
 |ip_stm_minor| the counter of that records the current subject id |
 
 Modify them to the correct location of your own computer. Then, you can try building the IP Plant in Unity3D.
+
+### Configure CyberSubsystem
+Download the CyberSubsystem and then revise the following file paths to use it.
+| file | name | meaning|
+| ---- | ---- | ------ |
+| main_process.py| myList (line 17) | output directory |
+| main_process.py | minor_f (line 37) | the counter that records the current physical trajectory id |
+| guisim.py | minor_f (line 148, 236, 423) | the counter that records the current physical trajectory id |
+| guisim.py | subject_f (line 152) | the counter that records the current subject id |
+| guisim.py | directory (line 326) | the directory that stores pictures |
+| guisim.py | Input_DATA_DIR (line 406, 588) | output directory |
+| guisim.py | process (line 594) | the directory of the ip plant |
+
+After revising all the paths, try to run the cybersubsystem by
+```
+python2.7 main_process.py
+```
+
